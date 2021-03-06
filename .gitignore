@@ -60,8 +60,7 @@ coverage.xml
 db.sqlite3
 db.sqlite3-journal
 
-settings/local_settings.py
-local_settings
+
 production_settings.py
 
 # Flask stuff:

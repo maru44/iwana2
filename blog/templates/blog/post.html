@@ -1,0 +1,59 @@
+{% extends 'blog/base.html' %}
+{% block main %}
+<div class="pt20">
+  <h1 class="h2Size">{{ func }}</h1>
+  <div class="mt20">
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      <div class="field">
+        <label for="id_want_name">欲しいもの</label>
+        {{ form.want_name }}
+        {% if form.want_name.errors %}
+          {{ form.want_name.error }}
+        {% endif %}
+      </div>
+      <div class="field mt10">
+        <label for="id_want_price">価格目安</label>
+        {{ form.want_price }}
+        {% if form.want_price.errors %}
+          {{ form.want_price.error }}
+        {% endif %}
+      </div>
+      <div class="field mt10">
+        <label for="id_want_plat">プラットフォーム指定</label>
+        <div class="mt5">
+          <input type="checkbox" name="plat_all" id="plat_all">
+          <label for="plat_all">全て</label>
+        </div>
+        <div class="flexNormal mt5 alCen" id="want_plat">
+          {% for plat in plats %}
+            <div class="mr20">
+              <input id="plat_{{ plat.slug }}" name="wanted_plat" value="{{ plat }}"
+               type="checkbox" {% if plat.name in init_plats %}checked{% endif %}>
+              <label for="plat_{{ plat.slug }}">{{ plat }}</label>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      <div class="field mt10">
+        <label for="id_picture">画像</label>
+        {{ form.picture }}
+        {% if form.picture.errors %}
+          {{ form.picture.error }}
+        {% endif %}
+      </div>
+      <div class="field mt10">
+        <label for="id_want_intro">説明</label>
+        {{ form.want_intro }}
+        {% if form.want_intro.errors %}
+          {{ form.want_intro.error }}
+        {% endif %}
+      </div>
+      <div class="field mt30">
+        <button type="submit" class="btNormal btFormat1 btSize1">送信する</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

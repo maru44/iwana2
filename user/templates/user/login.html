@@ -1,0 +1,48 @@
+{% extends "blog/base.html" %}
+{% block title %}- ログイン{% endblock %}
+{% block main %}
+<div class="pt40">
+  <h3>ログイン</h3>
+    <!-- form start -->
+    <form method="POST" class="mt10">
+      {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="field">
+          <label for="id_username">ユーザー名</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            {{ form.username.error }}
+          {% endif %}
+        </div>
+        <div class="field mt10">
+          <label for="id_password">パスワード</label>
+          {{ form.password }}
+          {% if form.password.errors %}
+            {{ form.password.error }}
+          {% endif %}
+        </div>
+        <input type="hidden" name="next" value="{{ request.GET.next }}">
+      <div class="mt20">
+        <a class="a_under" href="{% url 'user:reset' %}">パスワードを忘れたらこちら</a>
+      </div>
+      <div class="mt10">
+        <button class="pt5 pb5 wM500px btFormat1 btNormal" type="submit">ログイン</button>
+      </div>
+    </form>
+    <!-- form end -->
+    <h4 class="mt20 textCen wM500px">---- 会員登録はこちら ----</h4>
+    <div class="mt10">
+      <button class="pt5 pb5 wM500px btNormal btFormat1 hrefBox">
+        会員登録
+        <a class="hrefBoxIn"  href="{% url 'user:register' %}"></a>
+      </button>
+    </div>
+    <h4 class="mt30 textCen wM500px">---- Social Login ----</h4>
+    <div class="mt10">
+      <button class="googleLogin btNormal wM500px hrefBox pt5 pb5">
+        Googleでログイン
+        <a href="{% url 'auth:begin' 'google-oauth2' %}" class="hrefBoxIn"></a>
+      </button>
+    </div>
+</div>
+{% endblock %}

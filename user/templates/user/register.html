@@ -1,0 +1,122 @@
+{% extends "blog/base.html" %}
+{% load i18n %}
+{% block title %}- 会員登録{% endblock %}
+{% block main %}
+<div class="pt40">
+  <h3>会員登録</h3>
+    <div class="mt10">
+      <!-- form start -->
+      <form method="POST" action="">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+        <div class="field">
+          <label for="id_username">ユーザーネーム</label>
+          {{ form.username }}
+          {% if form.username.errors %}
+            {{ form.username.error }}
+          {% endif %}
+        </div>
+        <div class="field mt10">
+            <label for="id_email">メールアドレス</label>
+            {{ form.email }}
+            {% if form.email.errors %}
+              {{ form.email.error }}
+            {% endif %}
+        </div>
+        <div class="field mt10">
+            <label for="id_password1">パスワード</label>
+            {{ form.password1 }}
+            {% if form.password1.errors %}
+              {{ form.password1.error }}
+            {% endif %}
+        </div>
+        <div class="field mt10">
+            <label for="id_password2">確認用パスワード</label>
+            {{ form.password2 }}
+            {% if form.password2.errors %}
+              {{ form.password2.error }}
+            {% endif %}
+        </div>
+        <div class="mt30">
+          <input id="kiyakuInput" class="mr20" type="checkbox">
+            <a class="active" id="kiyakuOpen">利用規約</a>に同意します。
+        </div>
+        <div class="mt20">
+          <button disabled class="pt5 pb5 wM500px btFormat1 btNormal" id="regiSub" type="submit">会員登録</button>
+        </div>
+      </form>
+      <!-- form end -->
+      <h4 class="mt20 textCen wM500px">---- ログイン ----</h4>
+      <div class="mt10">
+        <button class="pt5 pb5 wM500px btFormat1 btNormal hrefBox">
+          ログイン
+          <a href="{% url 'user:login' %}" class="hrefBoxIn"></a>
+        </button>
+      </div>
+      <h4 class="mt30 textCen wM500px">---- Social Login ----</h4>
+      <div class="mt10">
+        <button class="googleLogin btNormal wM500px hrefBox pt5 pb5">
+          Googleでログイン
+          <a href="{% url 'auth:begin' 'google-oauth2' %}" class="hrefBoxIn"></a>
+        </button>
+      </div>
+    </div>
+</div>
+<!--  modal  -->
+<div class="modal off"></div>
+<div class="modalCon modalConKiyaku off">
+  <div class="modalTitle">
+    <h2>利用規約<span class="floatR closeModal">×</span></h2>
+  </div>
+  <div class="modalContents mt30">
+    <div>
+      <h3>会員登録について</h3>
+      <p class="mt5">
+        パスワードは各人が大切に保管してください。決して他人に教えたり等しないでください。<br>
+        こちらの独自の裁量で不適切なユーザー名や名前だと判断した場合、ユーザー名や名前の削除、ユーザーの凍結を行います。
+      </p>
+      <h3 class="mt10">利用規約の変更について</h3>
+      <p class="mt5">
+        必要に応じて、通知することなくいつでも規約を変更することがあります。これらの変更後に本サービスを利用した場合、変更した規約に同意したものとみなされます。
+      </p>          
+      <h3 class="mt10">禁止事項</h3>
+      <p class="mt5">このサービスの利用にあたり、以下の項目を禁止します:</p>
+      <ol class="ml30 mt10">
+        <li>サイトからデータまたはその他のコンテンツを体系的に取得し、当サービスからの書面による許可なしに、コンパイル、データベース、またはディレクトリを直接または間接的に作成またはコンパイルする。</li>
+        <li>未承諾の電子メールを送信する目的で電子的またはその他の手段でユーザーのユーザー名や電子メールアドレスを収集したり、自動化された手段または偽装してユーザーアカウントを作成したりするなど、サイトを不正に使用する。</li>
+        <li>コンテンツの使用またはコピーを防止または制限したり、サイトおよび/またはサイトに含まれるコンテンツの使用を制限する機能を含む、サイトのセキュリティ関連機能を回避、無効化、またはその他の方法で妨害すること。</li>
+        <li>サイトの不正なフレーミングまたはサイトへのリンクに従事する。</li>
+        <li>特にユーザーのパスワードなどの重要なアカウント情報を入手しようとする試みにおいて、私たちや他のユーザーをだます、詐欺、または誤解させる。</li>
+        <li>当サービスのサポートサービスを不適切に使用したり、乱用または不正行為の虚偽の報告を提出したりする。</li>
+        <li>スクリプトを使用してコメントやメッセージを送信したり、データマイニング、ロボット、または同様のデータ収集および抽出ツールを使用したりするなど、システムの自動使用に従事する。</li>
+        <li>サイト、またはサイトに接続されているネットワークまたはサービスに干渉し、混乱させ、または過度の負担をかけること。</li>
+        <li>別のユーザーまたはユーザーになりすまそうとしたり、別のユーザーのユーザー名を使用したりすること。</li>
+        <li>ユーザーを販売または譲渡する。</li>
+        <li>他の人に嫌がらせ、虐待、または危害を加えるために、サイトから取得した情報を使用する。</li>
+        <li>当サービスと競争するためのあらゆる努力の一環としてサイトを使用する、または収益を生み出すあらゆる努力または営利事業のためにサイトおよび/またはコンテンツを使用する。</li>
+        <li>サイトを構成する、またはサイトの一部を構成するソフトウェアを解読、逆コンパイル、逆アセンブル、またはリバースエンジニアリングすること。</li>
+        <li>サイトまたはサイトの一部へのアクセスを防止または制限するために設計されたサイトの対策を迂回する試み。</li>
+        <li>サイトの一部をあなたに提供することに従事している当サービスの従事者に嫌がらせ、迷惑、脅迫、または脅迫すること。</li>
+        <li>サイトのソフトウェアをコピーまたは改変すること。これには、Python、HTML、JavaScript、またはその他のコードが含まれますが、これらに限定されません。</li>
+        <li>ウイルス、トロイの木馬、または他のコンテンツのアップロードまたは送信（またはアップロードまたは送信の試み）、大文字の過剰な使用およびスパム行為（繰り返しテキストの継続的な投稿）を含み、当事者のサイトの中断のない使用および楽しむことを妨げる、またはサイトの使用、特徴、機能、操作、またはメンテナンスを変更、障害、混乱、変更、または妨害すること。</li>
+        <li>標準の検索エンジンまたはインターネットブラウザーの使用、使用、起動、開発、または配布の結果である場合を除き、サイトにアクセスするスパイダー、ロボット、チートユーティリティ、スクレーパー、オフラインリーダーなどの自動システム、または無許可のスクリプトやその他のソフトウェアを使用または起動する。</li>
+        <li>私たちおよびサイトの過度の非難、妨害、またはその他の傷害。</li>
+        <li>法や規制に抵触すること。</li>
+      </ol>
+      <h3 class="mt10">投稿のガイドライン</h3>
+      <p class="mt5">ユーザーが以下の規約のいずれかに違反した場合、事前の通知なしに、投稿されたデータを削除し、サービスの使用を制限し、ユーザーの登録を削除することがあります。<br><br>
+        投稿に関する禁止事項は以下です。</p>
+      <ol class="ml30 mt10">
+        <li>不快で冒涜的な表現、暴力的な表現、人種差別的な表現、攻撃的で憎悪をふくんだ言葉;</li>
+        <li>宗教、人種、性別、年齢、性的嗜好、障害に基づく差別的な表現;</li>
+        <li>違反行為への言及;</li>
+        <li>虚偽または誤解を招く投稿;</li>
+      </ol>
+      <h3 class="mt10">プライバシーポリシー</h3>
+      <p class="mt5">レコメンドのために活動記録を取得する可能性があります。<br>
+        ユーザー情報が第三者に提供されたり、悪意を持って使用されることはありません。
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}

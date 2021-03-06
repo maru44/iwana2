@@ -1,0 +1,8 @@
+{{ user }}様
+
+{{ offeruser }}様からのメッセージです。
+
+URL:
+{{ protocol}}://{{ domain }}/wanted/{{ slug }}
+
+Iwana 公式

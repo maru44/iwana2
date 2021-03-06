@@ -1,0 +1,37 @@
+{% extends 'blog/base.html' %}
+{% block ogp %}
+  <meta property="og:type" content="article">
+  <meta property="og:description" content='{{ target }}さんの欲しいものリスト | Iwanaで欲しいものを手に入れよう。あなたの持っているものを欲しがっている人を探そう。'>
+  <meta property="og:url" content="https://iwana.link/">
+  <meta property="og:title" content="{{ target }}さんの欲しいものリスト">
+  <meta property="og:image" content="https://iwana.link/media/{{ target.picture }}">
+{% endblock %}
+{% block title %}- {{ target }}'s wanted{% endblock %}
+{% block main %}
+<div class="pt20">
+  <!-- target user information -->
+    <div class="flex1 flexNormal alCen userDetArea">
+        <div class="imgCircle" style="background-image: url('/media/{{ target.picture }}');"></div>
+        <div class="ml10 flex1 ovHide">
+            <h1 class="whNormal h3Size">{{ target }}</h1>
+        </div>
+        {% if user.is_authenticated %}
+          {% if target == request.user %}
+            <div class="w20px textCen btnEl ml10 hrefBox">
+              S
+              <a href="{% url 'user:profile' %}" class="hrefBoxIn"></a>
+            </div>
+          {% endif %}
+        {% endif %}
+    </div>
+    <div class="mt5">
+        <p>{{ target.intro | linebreaksbr }}</p>
+    </div>
+  <!-- user's posts -->
+    <div class="mt20">
+      {% for post in posts %}
+        {% include 'blog/post_list.html' %}
+      {% endfor %}
+    </div>
+</div>
+{% endblock %}

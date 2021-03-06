@@ -1,0 +1,23 @@
+{% extends 'blog/base.html' %}
+{% block title %}- 退会{% endblock %}
+{% block main %}
+<h3 class="">退会</h3>
+<div class="mt10">
+  <p>あなたの欲しいものリストは完全に削除されます。<br>
+    本当に退会しますか。
+  </p>
+  <div class="flexNormal mt10">
+    <a class="pt5 pb5 w100">退会</a>
+  </div>
+  <div class="modal off"></div>
+  <div class="modalCon off">
+    <div>
+      <h3>退会しますか?</h3>
+    </div>
+    <div class="mt25 flexNormal">
+      <a class="w50 h50px"><b>キャンセル</b></a>
+      <a href="{% url 'user:user_delete' user.username %}" class="flex-cen w50 h50px"><b>退会する</b></a>
+    </div>
+  </div>
+</div>
+{% endblock %}

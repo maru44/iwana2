@@ -1,0 +1,53 @@
+{% extends "blog/base.html" %}
+{% load static %}
+{% block title %}- プロフィール{% endblock %}
+{% block main %}
+<div class="pt20">
+  <h1 class="h3Size">
+    プロフィール変更
+  </h1>
+  <form class="mt20" method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="field">
+        <label for="id_name">表示名</label>
+        {{ uform.name }}
+      </div>
+      <div class="field mt10">
+        <label for="id_picture">画像</label>
+        {{ pform.picture }}
+      </div>
+      <div class="field mt10">
+        <label for="id_intro">自己紹介</label>
+        {{ uform.intro }}
+      </div>
+      <div class="mt30 field">
+        <button type="submit" class="btNormal btFormat1 btSize1">変更する</button>
+      </div>
+  </form>
+</div>
+<div class="mt20">
+  <div class="flexNormal">
+    <a class="pt10 pb10 mt5 active logoutStart">ログアウト</a>
+  </div>
+  <div class="modal off"></div>
+  <div class="modalConLogout off modalCon">
+    <div>
+      <h3>ログアウトしますか?</h3>
+    </div>
+    <div class="mt25 flexNormal spBw">
+      <button class="w48 h50px btFormat1 flexCen hrefBox">
+        <b>ログアウト</b>
+        <a href="{% url 'user:logout' %}" class="hrefBoxIn"></a>
+      </btn>
+      <button class="w48 h50px closeModal flexCen btNegative hrefBox">
+        <b>キャンセル</b>
+      </button>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block head %}
+<!--
+  <script src="{% static 'collect/profile.js' %}"></script>
+-->
+{% endblock %}

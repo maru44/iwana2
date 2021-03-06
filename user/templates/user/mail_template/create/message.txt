@@ -1,0 +1,9 @@
+{{ user }}様
+
+会員登録ありがとうございます。
+以下のURLをクリックして会員登録を完了してください。
+
+URL:
+{{ protocol}}://{{ domain }}{% url 'user:register_complete' token %}
+
+Iwana 公式

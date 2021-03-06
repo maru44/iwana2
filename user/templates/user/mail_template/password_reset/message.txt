@@ -1,0 +1,9 @@
+{{ user }}様
+
+パスワードリセット用のURLを添付しました。
+以下のURLからパスワードの再設定をお願いいたします。
+
+URL:
+{{ protocol}}://{{ domain }}{% url 'user:reset_confirm' uidb64=uid token=token %}
+
+Iwana 公式

@@ -1,0 +1,91 @@
+{% extends 'blog/base.html' %}
+{% block ogp %}
+  <meta property="og:type" content="website">
+  <meta property="og:description" content='メルカリ、ラクマ、ヤフオクの一斉検索ができます。簡単に商品の流通度合いや価格目安を図ることができます。'>
+  <meta property="og:url" content="https://iwana.link/">
+  <meta property="og:title" content="グローバル検索 | メルカリ、ラクマ、ヤフオクの一斉検索">
+  <meta property="og:image" content="https://ogp-builder.com/Suo2gx/https://iwana.link/global/">
+{% endblock %}
+{% block title %}- グローバル検索 | メルカリ、ラクマ、ヤフオクの一斉検索{% endblock %}
+{% block main %}
+<div class="">
+    <!-- explain -->
+    <div class="pt30">
+        <h1 class="h2Size">商品検索</h1>
+        <p class="pt10">ここでは各プラットフォームで一斉検索ができます。
+            検索には5秒前後の時間がかかります。
+            <br>&#x1f607;は売り切れマークです。
+            yahooオークションの絞り込みは未実装。
+        </p>
+    </div>
+    <!-- search word -->
+    <div class="pt40 field">
+        {% csrf_token %}
+        <label for="globalStr">検索ワード<span class="ml20 colorR">***</span></label>
+        <input name="keyword" type="text" id="globalStr" placeholder="キーワード">
+    </div>
+    <div class="mt15 field">
+      <label for="sold_select" name="sold">販売状況</label>
+      <select id="sold_select">
+        <option value="0">全て</option>
+        <option value="2">販売中</option>
+        <option value="1">売り切れ</option>
+      </select>
+    </div>
+    <div class="mt15 field">
+      <label for="category_select">カテゴリ</label>
+      <select id="category_select" name="category">
+        <option value="0" selected>---------</option>
+        <option value="1">レディース</option>
+        <option value="2">メンズ</option>
+        <option value="3">ベビー・キッズ</option>
+        <option value="4">インテリア・住まい・小物</option>
+        <option value="5">本・音楽・ゲーム</option>
+        <option value="6">おもちゃ・ホビー・グッズ</option>
+        <option value="7">コスメ・美容</option>
+        <option value="8">楽器</option>
+        <option value="9">チケット</option>
+        <option value="10">スマホ・家電・カメラ</option>
+        <option value="11">スポーツ・レジャー</option>
+        <option value="12">自動車・バイク</option>
+        <option value="13">ハンドメイド</option>
+        <option value="14">食料品</option>
+        <option value="15">飲み物</option>
+        <option value="16">酒</option>
+        <option value="17">その他</option>
+      </select>
+    </div>
+    <div id="globalBtn" class="mt30 btFormat1 btNormal wM500px flexCen border1 pl10 pr10">検索</div>
+    <!-- message -->
+    <div class="w100 pt20 messZone off">
+        <div class="mb10 aMess">
+          <p></p>
+        </div>
+    </div>
+    <!-- list of search result -->
+    <div class="mt60 pb10">
+      <h2 class="h3Size">メルカリ</h2>
+      <div class="flexNormal spBw">
+          <div class="flex1 textCen backThin">商品名</div>
+          <div class="scrapePrice ml20 textCen backThin">値段</div>
+      </div>
+      <div class="mercariArea"></div>
+    </div>
+    <div class="pt30 pb10">
+      <h2 class="h3Size">ラクマ</h2>
+      <div class="flexNormal spBw">
+        <div class="flex1 textCen backThin">商品名</div>
+        <div class="scrapePrice textCen ml20 backThin">値段</div>
+      </div>
+      <div class="rakumaArea"></div>
+    </div>
+    <div class="pt30 pb10">
+        <h2 class="h3Size">Yahoo オークション</h2>
+        <div class="flexNormal spBw">
+          <div class="flex1 textCen backThin">商品名</div>
+          <div class="scrapePrice textCen ml20 backThin">値段</div>
+        </div>
+        <div class="yahooArea"></div>
+    </div>
+</div>
+{% endblock %}

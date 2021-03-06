@@ -1,0 +1,103 @@
+{% load static %}
+<html prefix="og: http://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-C5EW2JNG4R"></script>
+      <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+      
+        gtag('config', 'G-C5EW2JNG4R');
+      </script>
+    <!-- GA end -->
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    {% block ogp %}
+      <meta property="og:type" content="website">
+      <meta property="og:description"
+       content='逆フリマプラットフォーム！Iwanaが商品を探しを簡略化します！レアなグッズやアイテム等欲しいものを提示して手に入れよう。あなたの持っているものを欲しがっている人を探そう。'>
+      <meta property="og:url" content="https://iwana.link/">
+      <meta property="og:title" content="逆フリマプラットフォーム | もう商品を探さない!!">
+      <meta property="og:image" content="https://ogp-builder.com/Suo2gx/https://iwana.link/">
+    {% endblock %}
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="og:site_name" content="Iwana">
+    <link rel="stylesheet" type="text/css" href="{% static 'blog/main.css' %}">
+    <script src="{% static 'blog/jquery-3.5.1.min.js' %}"></script>
+    <script src="{% static 'blog/main.js' %}"></script>
+    {% block head %}{% endblock %}
+    <title>Iwana {% block title %}| もう商品を探さない!!{% endblock %}</title>
+    {% block seo %}
+      <meta content="逆フリマプラットフォーム！Iwanaが商品を探しを簡略化します！レアなグッズやアイテム等欲しいものを提示して手に入れよう。あなたの持っているものを欲しがっている人を探そう。" name="description">
+    {% endblock %}
+  </head>
+  <body>
+    <header>
+      <div class="headerCon w100 alCen flexNormal">
+        <div class="headerTop hrefBox">
+          Iwana
+          <a href="{% url 'home' %}" class="hrefBoxIn"></a>
+        </div>
+        <div class="headerUserArea">
+          {% if user.is_authenticated %}
+            <div class="imgCircle mla hrefBox" style="background-image: url('/media/{{ user.picture }}');">
+              <a href="{% url 'users' user.username %}" class="hrefBoxIn"></a>
+            </div>
+          {% else %}
+            <div class="circle mla hrefBox flexCen pl5 pr5">
+              ログイン
+              <a href="{% url 'user:login' %}" class="hrefBoxIn"></a>
+            </div>
+          {% endif %}
+        </div>
+        <div class="circle hrefBox flexCen ml20 toPost">
+          +
+          <a href="{% url 'post' %}" class="hrefBoxIn"></a>
+        </div>
+      </div>
+      <div class="headerCon2 w100 alCen flexNormal">
+        <div class="w50 hrefBox flexCen" style="border-right: 3px solid #ffd9d1;">
+          みんなの欲しいもの
+          <a href="{% url 'home' %}" class="hrefBoxIn"></a>
+        </div>
+        <div class="w50 hrefBox flexCen" style="border-left: 3px solid #ffd9d1;">
+          グローバル検索
+          <a href="{% url 'global_search' %}" class="hrefBoxIn"></a>
+        </div>
+      </div>
+      {% block header %}{% endblock %}
+    </header>
+    <div class="content">
+      <main>
+          <div class="mainZone mla mra">
+            <!--  message  -->
+            {% if messages %}
+              <div class="w100 pt20">
+                {% for mess in messages %}
+                <div class="mb10 aMess">
+                  <p>{{ mess }}</p>
+                </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+            <!--   main  -->
+            {% block main %}
+            {% endblock %}
+          </div>
+      </main>
+    </div>
+    <footer>
+      <div class="footerCon flexNormal">
+        <div class="footerCopy pt20">
+          <h5>&copy; 2021 Maru-t</h5>
+        </div>
+        <div class="footerInq mla pt20">
+          <a href="{% url 'inquiry' %}">
+            <h5>お問い合わせ</h5>
+          </a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

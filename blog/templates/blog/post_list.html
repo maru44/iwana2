@@ -1,0 +1,53 @@
+{% if user.is_authenticated and post.user == request.user %}
+  <div class="flexNormal mb20 spBw">
+    {% if post.is_gotten %}
+      <div class="w8 cursorPointer gottenBtn flexCol" wanted="{{ post.slug }}">
+        <div class="textCen f12">入手</div>
+        <div class="is_gotten flexCen flex1">&#10004;</div>
+      </div>
+    {% else %}
+      <div class="w8 cursorPointer gottenBtn flexCol" wanted="{{ post.slug }}">
+        <div class="textCen f12">入手</div>
+        <div class="is_gotten flexCen flex1"></div>
+      </div>
+    {% endif %}
+    <article class="aPost flexNormal hrefBox w90">
+      <div class="frameContain" style="background-image: url('/media/{{ post.picture }}');"></div>
+      <div class="ml20 flex1">
+        <h2 class="postTitle h4Size">{{ post.want_name }}</h2>
+        <p class="mt5 postDet">
+          {{ post.want_intro }}
+        </p>
+        <div class="platArea">
+          {% for plat in post.plat.all %}
+            <span>{{ plat }}</span>
+          {% endfor %}
+        </div>
+      </div>
+      <a class="hrefBoxIn" href="{% url 'detail' post.slug %}"></a>
+    </article>
+  </div>
+{% else %}
+<article class="mb20 aPost flexNormal hrefBox">
+  <div class="frameContain" style="background-image: url('/media/{{ post.picture }}');"></div>
+  <div class="ml20 flex1">
+    <h2 class="postTitle h4Size">{{ post.want_name }}</h2>
+    <p class="mt5 postDet">
+      {{ post.want_intro }}
+    </p>
+    <div class="platArea">
+      {% for plat in post.plat.all %}
+        <span>{{ plat }}</span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="ml10 mr10">
+    <div class="is_gotten">
+      {% if post.is_gotten %}
+        &#10004;
+      {% endif %}
+    </div>
+  </div>
+  <a class="hrefBoxIn" href="{% url 'detail' post.slug %}"></a>
+</article>
+{% endif %}

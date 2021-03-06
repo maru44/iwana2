@@ -1,0 +1,9 @@
+{% extends "blog/base.html" %}
+{% block main %}
+    <h3 class="pt20">ログアウトしました。</h3>
+    <div class="">
+        <small class="">
+          <a class="" href="{% url 'user:login' %}">ログイン</a>
+        </small>
+    </div>
+{% endblock %}

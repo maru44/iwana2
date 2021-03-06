@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+{% block title %}- お問い合わせ{% endblock %}
+{% block main %}
+<div class="pt20">
+    <h1 class="h3Size">お問い合わせ</h1>
+    <div class="mt20">
+      <form method="post">
+          {% csrf_token %}
+          <div class="field">
+              <label for="id_name">名前</label>
+              <input type="text" required maxlength="=36" id="id_name" name="inq_name">
+          </div>
+          <div class="field mt10">
+              <label for="id_mail">メールアドレス</label>
+              <input type="email" required id="id_mail" name="inq_mail">
+          </div>
+          <div class="field mt10">
+            <label for="id_cat">項目</label>
+            <input type="text" id="id_cat" name="inq_category" maxlength="="36>
+          </div>
+          <div class="field mt10">
+            <label for="id_content">内容</label>
+            <textarea rows="5" required id="id_content" name="inq_content" required></textarea>
+          </div>
+          <div class="field mt20">
+              <button type="submit" class="btNormal btFormat1 btSize1">送信</button>
+          </div>
+      </form>
+    </div>
+</div>
+{% endblock %}

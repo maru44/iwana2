@@ -1,0 +1,5 @@
+project/settings.py merge=ours
+project/local_settings.py merge=ours
+project/urls.py merge=ours
+project/production_settings.py merge=ours
+requirements.txt merge=ours

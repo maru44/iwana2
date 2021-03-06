@@ -1,0 +1,13 @@
+{% extends "blog/base.html" %}
+{% block title %}- 会員登録完了{% endblock %}
+{% load static %}
+{% block main %}
+<div class="pt40">
+   <p>
+      会員登録が完了しました。 
+   </p>
+     <div class="flexNormal mt15">
+       <a class="w100 pt5 pb5" href="{% url 'home' %}">Home</a>
+     </div>
+</div>
+{% endblock %}

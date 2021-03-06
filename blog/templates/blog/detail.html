@@ -1,0 +1,157 @@
+{% extends 'blog/base.html' %}
+{% load customs %}
+{% block ogp %}
+  <meta property="og:type" content="article">
+  <meta property="og:description"
+    {% if post.is_gotten %}
+      content='{{ post.user }}さんは{{ post }}を入手しました。あなたもIwanaで欲しいものを手に入れよう！'
+    {% else %}
+      content='{{ post.user }}さんが{{ post }}を欲しがっています。あなたの{{ post }}を提案しませんか？'
+    {% endif %}>
+  <meta property="og:url" content="https://iwana.link/">
+  <meta property="og:title" content="{{ post }} | 欲しいものページ">
+  <meta property="og:image" content="https://iwana.link/media/{{ post.picture }}">
+{% endblock %}
+{% block title %}- {{ post }}{% endblock %}
+{% block main %}
+<div class="pt20 detPost">
+    <h1 class="brAll h2Size">{{ post }}</h1>
+    <div class="mt20">
+      <div class="frameContain w100" style="background-image: url('/media/{{ post.picture }}');"></div>
+    </div>
+    <div class="mt20 flexNormal spBw alFlBot">
+      <div class="flex1 flexNormal alCen hrefBox">
+        <div class="imgCircle" style="background-image: url('/media/{{ post.user.picture }}');"></div>
+        <div class="ml10 flex1 ovHide">
+          <h2 class="whNormal h3Size">{{ post.user }}</h2>
+        </div>
+        <a href="{% url 'users' post.user.username %}" class="hrefBoxIn"></a>
+      </div>
+      <div class="">
+        {% if post.posted.year == now.year %}
+          <small>{{ post.posted|date:"m/d H:i" }}</small>
+        {% else %}
+          <small>{{ post.posted|date:"m/d H:i (Y)" }}</small>
+        {% endif %}
+      </div>
+    </div>
+    <div class="platArea mt15 flexNormal flexWrap alCen">
+        <div class="mr20 mt5">希望プラットフォーム: </div>
+        <div class="mt5">
+          {% for plat in post.plat.all %}
+            <span>{{ plat }}</span>
+          {% endfor %}
+        </div>
+    </div>
+    {% if post.want_price %}
+      <div class="mt10 flexNormal flexWrap">
+        <div class="mr20 mb5">価格目安: </div>
+        <div class="">{{ post.want_price }} 円</div>
+      </div>
+    {% endif %}
+    <div class="mt30">
+      <p class="brAll">
+          {{ post.want_intro | linebreaksbr }}
+      </p>
+    </div>
+</div>
+{% if user.is_authenticated and post.user == request.user %}
+  <div class="mt40 flexNormal spBw">
+    <div class="w30 btNormal btnEl pt10 pb10 flexCen gottenBtn" wanted="{{ post.slug }}">入手
+      <span class="is_gotten ml10">{% if post.is_gotten %}&#10004;{% endif %}</span>
+    </div>
+    <div class="w30 btNormal btFormat1 pt10 pb10 flexCen hrefBox">編集
+      <a href="{% url 'update' post.slug %}" class="hrefBoxIn"></a>
+    </div>
+    <div class="w30 btNormal btFormat1 pt10 pb10 flexCen delWantedBtn" wanted="{{ post.slug }}">削除</div>
+  </div>
+  <!-- modal for delete  -->
+  <div class="modal off"></div>
+  <div class="modalDelWanted off modalCon">
+    <div>
+      <h3>削除しますか?</h3>
+    </div>
+    <div class="mt25 flexNormal spBw">
+      <button class="w48 h50px btFormat1 flexCen hrefBox">
+        <b>削除する</b>
+        <a href="{% url 'delete' post.slug %}" class="hrefBoxIn"></a>
+      </btn>
+      <button class="w48 h50px closeModal flexCen btNegative hrefBox">
+        <b>キャンセル</b>
+      </button>
+    </div>
+  </div>
+{% else %}
+<!-- offer zone -->
+<!-- offer form -->
+  {% if post.is_gotten %}
+    <div class="mt40 flexNormal spBw">
+      <div class="w30 btnEl pt10 pb10 flexCen" wanted="{{ post.slug }}">入手
+        <span class="is_gotten ml10">&#10004;</span>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+<div class="mt40 offerZone">
+  <h2 class="h3Size">オファー</h2>
+  {% csrf_token %}
+  <div class="mt10 field">
+  <!-- if is_gotten -->
+    {% if post.is_gotten %}
+      <h4 class="textCen have">入手済み</h4>
+
+      <div class="notHave off">
+        <label for="id_offer_url">メッセージまたはリンク</label>
+        <div class="flexNormal">
+          <input type="text" name="offer" id="id_offer_url" style="max-width: 1200px; width: 70%;">
+          <div id="offeringBtn" class="ml10 btNormal btFormat1 flexCen border1 pl10 pr10">送信</div>
+        </div>
+      </div>
+  <!-- if not is_gotten -->
+    {% else %}
+      <h4 class="textCen off have">入手済み</h4>
+
+      <div class="notHave">
+        <label for="id_offer_url">メッセージまたはリンク</label>
+        <div class="flexNormal">
+          <input type="text" name="offer" id="id_offer_url" style="max-width: 1200px; width: 70%;">
+          <div id="offeringBtn" class="ml10 btNormal btFormat1 flexCen border1 pl10 pr10">送信</div>
+        </div>
+      </div>
+    {% endif %}
+  <!-- offer list -->
+    <div class="mt20 offerList">
+      {% for offer in offers %}
+        <div class="flexNormal mb10 alCen">
+          {% if offer.user %}
+            <div class="mr10  hrefBox">
+                <div class="offerUserArea">
+                  <div class="imgCircle mla mra" style="background-image: url('/media/{{ offer.user.picture }}'); width: 30px; height: 30px;"></div>
+                </div>
+                <a href="{% url 'users' offer.user.username %}" class="hrefBoxIn"></a>
+            </div>
+          {% endif %}
+          <article class="flex1 aOffer">
+            <div class="ml10">
+              <p class="brAll">
+                {% if offer.offer_url|startswith:'https' %}
+                  <a href="{{ offer.offer_url }}" target="_new">{{ offer.offer_url }}</a>
+                {% else %}
+                  {{ offer.offer_url }}
+                {% endif %}
+              </p>
+            </div>
+            <div class="mt5 textRight">
+              {% if offer.posted.year == now.year %}
+                <small>{{ offer.posted|date:"m/d H:i" }}</small>
+              {% else %}
+                <small>{{ offer.posted|date:"m/d H:i (Y)" }}</small>
+              {% endif %}
+            </div>
+          </article>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

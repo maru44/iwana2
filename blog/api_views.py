@@ -34,6 +34,8 @@ def offer_mail(req, obj, offer_user):
     message_template = get_template('blog/mail_template/offer_notify/message.txt')
     message = message_template.render(context)
 
+    obj.objects.update(is_noticed=True)
+
     obj.notify_mail(subject, message, from_email)
 
 class OfferingAPI(views.APIView):
@@ -73,12 +75,20 @@ class OfferingAPI(views.APIView):
             if user.is_authenticated:
                 serializer.save(wanted=wanted, user=user)
                 offer_user = user
+
+                # send notify with email rapidly
+                if not user.is_superuser:
+                    offer_mail(self.request, wanted, offer_user)
+                else:
+                    pass
+                    #offer_mail_batch(self.request, wanted, offer_user)
+
+                offer_mail(self.request, wanted, offer_user)
+
             else:
                 serializer.save(wanted=wanted)
                 offer_user = "アノニマスユーザー"
-            
-            # send notify by mail
-            offer_mail(self.request, wanted, offer_user)
+
 
             return response.Response(serializer.data)
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)

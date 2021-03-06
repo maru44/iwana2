@@ -110,6 +110,9 @@ REST_FRAMEWORK = {
 # local settings
 
 try:
-    from .local_settings import *
+    if os.environ.get("ENVIRONMENT") == "production":
+        from .production_settings import *
+    else:
+        from .local_settings import *
 except ImportError:
     pass

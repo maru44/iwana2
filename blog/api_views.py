@@ -16,7 +16,6 @@ from django.template.loader import get_template
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
     domain = current_site.domain
-
     context = {
         "user": obj.user,
         'protocol': req.scheme,
@@ -25,17 +24,11 @@ def offer_mail(req, obj, offer_user):
         'offeruser': offer_user,
         #'offer': offer_url,
     }
-
     from_email = settings.FROM_EMAIL
-
     subject_template = get_template('blog/mail_template/offer_notify/subject.txt')
     subject = subject_template.render(context)
-
     message_template = get_template('blog/mail_template/offer_notify/message.txt')
     message = message_template.render(context)
-
-    obj.objects.update(is_noticed=True)
-
     obj.notify_mail(subject, message, from_email)
 
 class OfferingAPI(views.APIView):

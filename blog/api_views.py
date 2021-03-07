@@ -40,12 +40,16 @@ def batch_offer(request, wanted_slug):
     api_url = settings.AWS_BATCH_URL
     if request.method == "POST":
         data = json.loads(request.body)
+
         wanted = wanted_slug
+
         if request.user.is_authenticated:
             from_user = "Iwana公式"
         else:
             from_user = "非ログインユーザー"
-        dt = timezone.now()
+
+        now = timezone.now()
+        dt = strftime("%Y%m%d%H%M%s")
         
         r = requests.post(
             api_url,

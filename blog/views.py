@@ -15,6 +15,9 @@ import requests, json
 
 from django.conf import settings
 
+# integrity error (same sluug)
+from django.db import IntegrityError
+
 def gen_id():
     random_ = [random.choice(string.ascii_letters + string.digits + '-' + '_') for i in range(8)]
     id_ = ''.join(random_)
@@ -50,13 +53,18 @@ def create_wanted(request):
             post = form.save(commit=False)
             post.user = request.user
 
-            # generate id
-            post.slug = gen_id()
-
             selected = request.POST.getlist('wanted_plat')# platform many
             plats = Plat.objects.filter(name__in=selected)
 
-            post.save()
+            try:
+                post.slug = gen_id()
+                post.save()
+            except IntegrityError:
+                post.slug = gen_id()
+                post.save()
+            except Exception as e:
+                print(e)
+
             post.plat.set(plats)
             messages.success(request, f'{post}を作成しました。')
             return redirect('home')

@@ -27,4 +27,5 @@ urlpatterns = [
     #########################################
     path('api/wanted/<wanted_slug>/', api.OfferingAPI.as_view(), name='offering'),
     path('api/scrape/', api.scrape_api, name="scrape"),
+    path('api/batch/<wanted_slug>/', api.batch_offer, name='offer_batch'),
 ]

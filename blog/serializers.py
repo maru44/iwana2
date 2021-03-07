@@ -5,7 +5,7 @@ from user.models import User
 class WantedSerializer(serializers.ModelSerializer):
     class Meta:
         model = Wanted
-        fields = ['slug', 'pk']
+        fields = ['slug', 'pk', 'is_accept_official']
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -17,5 +17,5 @@ class OfferSerializer(serializers.ModelSerializer):
     class Meta:
         model = Offer
         fields = [
-            'offer_url', 'user', 'posted', 'wanted'
+            'offer_url', 'user', 'posted', 'wanted', 'is_noticed'
         ]

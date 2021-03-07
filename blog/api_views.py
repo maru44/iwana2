@@ -13,10 +13,12 @@ from django.http import JsonResponse, Http404
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import get_template
 
+# for batch of offer
+from django.utils import timezone
+
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
     domain = current_site.domain
-
     context = {
         "user": obj.user,
         'protocol': req.scheme,
@@ -25,16 +27,35 @@ def offer_mail(req, obj, offer_user):
         'offeruser': offer_user,
         #'offer': offer_url,
     }
-
     from_email = settings.FROM_EMAIL
-
     subject_template = get_template('blog/mail_template/offer_notify/subject.txt')
     subject = subject_template.render(context)
-
     message_template = get_template('blog/mail_template/offer_notify/message.txt')
     message = message_template.render(context)
-
     obj.notify_mail(subject, message, from_email)
+
+def batch_offer(request, wanted_slug):
+    permission_classes = [permission.AllowAny, ]
+
+    api_url = settings.AWS_BATCH_URL
+    if request.method == "POST":
+        data = json.loads(request.body)
+        wanted = wanted_slug
+        if request.user.is_authenticated:
+            from_user = "Iwana公式"
+        else:
+            from_user = "非ログインユーザー"
+        dt = timezone.now()
+        
+        r = requests.post(
+            api_url,
+            json.dumps({
+                "wanted": wanted,
+                "from_user": fron_user,
+                "dt": dt,
+            }),
+            headers={'Content-Type': 'applications/json'},
+        )
 
 class OfferingAPI(views.APIView):
     def get_object(self, wanted_slug):
@@ -73,12 +94,18 @@ class OfferingAPI(views.APIView):
             if user.is_authenticated:
                 serializer.save(wanted=wanted, user=user)
                 offer_user = user
+
+                # send notify with email rapidly
+                if not user.is_superuser:
+                    offer_mail(self.request, wanted, offer_user)
+                else:
+                    #offer_mail_batch(self.request, wanted, offer_user)
+                    pass
+
             else:
                 serializer.save(wanted=wanted)
                 offer_user = "アノニマスユーザー"
-            
-            # send notify by mail
-            offer_mail(self.request, wanted, offer_user)
+
 
             return response.Response(serializer.data)
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)

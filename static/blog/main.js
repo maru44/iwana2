@@ -73,6 +73,7 @@ let postOffer = () => {
     };
 };
 
+// add offer elements
 let offerAdd = (response) => {
     let addEl;
     if (response.user) {
@@ -128,18 +129,23 @@ let globalData = (word) => {
     })
 }
 
+// generate link elements
+// for global search
 let genLinkEl = (which, dict) => {
     let color = "";
     if (dict["sold"]) {
         color = "&#x1f607; ";
     }
-    let newEl = `<div class="w100 flexNormal spBw alCen hrefBox mt5 scrapeTable">` +
-        `<div class="flex1 noWrap ovHide backThin h100 flexNormal alCen">${color}${dict["name"]}</div>` +
-        `<div class="ml20 backThin scrapePrice flexCen h100">${dict["price"]}</div>` +
+    let newEl = `<div class="alCen hrefBox mt5 scrapeTable mb20">` +
+        `<div class="frameContain" style="background-image: url('${dict["image"]}');"></div>` +
+        `<div class="w100 f14px noWrap ovHide mt5">${color}${dict["name"]}</div>` +
+        `<div class="mla scrapePrice f14px">${dict["price"]}</div>` +
         `<a target="_new" href="${dict["href"]}" class="hrefBoxIn"></a></div>`
+    console.log(dict["image"]);
     $(`.${which}Area`).append(newEl);
 }
 
+// select all platform
 let checkPlatAll = btn => {
     console.log(btn);
     if ($(btn).prop('checked')) {

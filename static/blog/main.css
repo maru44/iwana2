@@ -334,6 +334,7 @@ font
 /////////////////////*/
 
 .f40px { font-size: 40px; }
+.f14px { font-size: 14px; }
 .f12 { font-size: 12px; }
 /*  color  */
 
@@ -718,13 +719,38 @@ main
 
 /*    scrape    */
 
+.anyPlatArea {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+}
+
 .scrapeTable {
-    height: 34px; }
+    padding: 5px;
+    margin-left: 2%;
+    width: 23.5%; }
+    .scrapeTable .frameContain {
+        width: 100%;
+        padding-top: 100%;
+    }
+    .scrapeTable:nth-child(4n + 1) {
+        margin-left: 0;
+    }
+
+.mercariArea .scrapeTable {
+    background-color: #d1d6ff;
+}
+
+.rakumaArea .scrapeTable {
+    background-color: #ffc4c4;
+}
+
+.yahooArea .scrapeTable {
+    background-color: #fffcc7;
+}
 
 .scrapePrice {
-    width: 20%;
-    max-width: 200px;
-    min-width: 80px;
+    width: 100%;
 }
 
 /*///////////////////
@@ -752,4 +778,10 @@ responsive
     .mainZone {
         padding: 0 10px 60px 10px;
     }
+    .scrapeTable {
+        margin-left: 0;
+        width: 32%; }
+        .scrapeTable:not(:nth-child(3n + 1)) {
+            margin-left: 2%;
+        }
 }

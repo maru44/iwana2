@@ -736,6 +736,15 @@ main
         width: 100%;
         padding-top: 100%;
     }
+    .scrapeTable .hrefBoxIn {
+        text-decoration: none;
+        color: #1f1f1f;
+        font-size: 24px;
+    }
+    .scrapeTable .hrefBoxIn p {
+        transform: rotate(-30deg);
+        -webkit-transform: rotate(-30deg);
+    }
     .scrapeTable:nth-child(4n + 1) {
         margin-left: 0;
     }
@@ -790,4 +799,13 @@ responsive
         .scrapeTable:not(:nth-child(3n + 1)) {
             margin-left: 2%;
         }
+        .scrapeTable .hrefBoxIn {
+            font-size: 20px;
+        }
+}
+
+@media screen and (max-width: 399px) {
+    .scrapeTable .hrefBoxIn {
+        font-size: 14px;
+    }
 }

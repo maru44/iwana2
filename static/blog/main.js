@@ -133,14 +133,16 @@ let globalData = (word) => {
 // for global search
 let genLinkEl = (which, dict) => {
     let color = "";
+    let so = "";
     if (dict["sold"]) {
-        color = "&#x1f607; ";
+        color = "background-color: rgba(255, 255, 255, .6)";
+        so = "SOLD OUT";
     }
     let newEl = `<div class="alCen hrefBox mt5 scrapeTable mb20">` +
         `<div class="frameContain" style="background-image: url('${dict["image"]}');"></div>` +
-        `<div class="w100 f14px noWrap ovHide mt5">${color}${dict["name"]}</div>` +
+        `<div class="w100 f14px noWrap ovHide mt5">${dict["name"]}</div>` +
         `<div class="mla scrapePrice f14px">${dict["price"]}</div>` +
-        `<a target="_new" href="${dict["href"]}" class="hrefBoxIn"></a></div>`
+        `<a target="_new" href="${dict["href"]}" class="hrefBoxIn flexCen" style="${color}"><p>${so}</p></a></div>`
     console.log(dict["image"]);
     $(`.${which}Area`).append(newEl);
 }

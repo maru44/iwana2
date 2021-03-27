@@ -61,6 +61,59 @@ def batch_offer(request, wanted_slug):
             headers={'Content-Type': 'applications/json'},
         )
 
+class WantedAPI(views.APIView):
+    def get(self, request, format=None):
+
+        PAGI_NUM = 2
+
+        page = request.GET.get('page')
+        
+        if page is not None:
+            int_page = int(page)
+        else:
+            int_page = 1
+
+        wanteds = Wanted.objects.select_related('user')\
+            .prefetch_related('plat').order_by('-posted')[
+                ((int_page - 1) * PAGI_NUM):
+                int_page * PAGI_NUM + 1
+            ]
+        
+        serializer = WantedSerializer(wanteds, many=True)
+        return response.Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = WantedSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return response.Response(serializer.data)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class WantedDetailAPI(views.APIView):
+    def get_object(self, wanted_slug):
+        try:
+            return Wanted.objects.get(slug=wanted_slug)
+        except Wanted.DoesNotExist:
+            raise Http404
+
+    def get(self, request, wanted_slug, format=None):
+        wanted = self.get_object(wanted_slug)
+        serializer = WantedSerializer(wanted)
+        return response.Response(serializer.data)
+
+    def put(self, request, wanted_slug, format=None):
+        wanted = self.get_object(wanted_slug)
+        if serializer.is_valid():
+            serializer.save()
+            return response.Response(serializer.data)
+        return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, wanted_slug, format=None):
+        wanted = self.get_object(wanted_slug)
+        wanted.delete()
+        return response.Response(status=staus.HTTP_204_NO_CONTENT)
+
 class OfferingAPI(views.APIView):
     def get_object(self, wanted_slug):
         try:
@@ -113,27 +166,6 @@ class OfferingAPI(views.APIView):
 
             return response.Response(serializer.data)
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
-
-"""
-#AWS
-def scrape_api(request):
-    scrape_url = settings.SQRAPE_URL_AWS
-    if request.method == "POST":
-        data = json.loads(request.body)
-        keyword = data["keyword"]
-        r = requests.post(
-            scrape_url,
-            json.dumps({
-                "OperationType": "SCRAPE",
-                "Keys": {
-                    "keyword": keyword
-                }
-            }),
-            headers={'Content-Type': 'application/json'},
-        )
-        datas = r.json()
-        return JsonResponse(datas, safe=False)
-"""
 
 # heroku scrape
 def scrape_api(request):

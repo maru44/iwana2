@@ -16,7 +16,7 @@ INSTALLED_APPS = [
     'blog',
     'user',
     'rest_framework',
-    #'corsheaders',
+    'corsheaders',
     'requests',
     'storages',
     #'django_ses',
@@ -100,12 +100,28 @@ AUTH_USER_MODEL = 'user.User'
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'user:login'
 
+# drf fwt
+JWT_AUTH = {
+    'JWT_VERIFY_EXPIRATION': False,
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+
 # drf
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    'NON_FIELD_ERRORS_KEY': 'detail',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
+
+# cors
+CORS_ORIGIN_WHITELIST = (
+    'http://localhost:3000',
+)
 
 # local settings
 

@@ -20,7 +20,7 @@ let gottenChange = (btn) => {
     //console.log(slug);
 
     // fetch and change is_gotten
-    fetch(`/api/wanted/${slug}`, {
+    fetch(`/api/offering/${slug}`, {
         method: "GET",
     })
     .then((res) => {
@@ -50,8 +50,9 @@ let postOffer = () => {
         data = {
             "offer_url": offer_url,
         }
+        let target_slug = location.pathname.replace(/^\/wanted\//, '');
         // fetch to endpoint
-        fetch(`/api${location.pathname}`, {
+        fetch(`/api/offering/${target_slug}`, {
             method: "POST",
             body: JSON.stringify(data),
             headers: {

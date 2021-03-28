@@ -1,6 +1,5 @@
 from django.urls import path
 from . import views
-from . import api_views as api
 
 urlpatterns = [
     path('', views.home, name="home"),
@@ -20,12 +19,4 @@ urlpatterns = [
     path('inquiry/', views.inquiry, name="inquiry"),
     #scrape mercari and rakuma
     path('global/', views.global_search, name="global_search"),
-    #########################################
-    #                                       #
-    #                 API                   #
-    #                                       #
-    #########################################
-    path('api/wanted/<wanted_slug>/', api.OfferingAPI.as_view(), name='offering'),
-    path('api/scrape/', api.scrape_api, name="scrape"),
-    path('api/batch/<wanted_slug>/', api.batch_offer, name='offer_batch'),
 ]

@@ -16,7 +16,7 @@ INSTALLED_APPS = [
     'blog',
     'user',
     'rest_framework',
-    #'corsheaders',
+    'corsheaders',
     'requests',
     'storages',
     #'django_ses',
@@ -26,7 +26,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    #'corsheaders.middleware.CorsMiddleware',# cors
+    'corsheaders.middleware.CorsMiddleware',# cors
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -100,12 +100,47 @@ AUTH_USER_MODEL = 'user.User'
 LOGIN_REDIRECT_URL = 'home'
 LOGIN_URL = 'user:login'
 
+# drf fwt
+JWT_AUTH = {
+    'JWT_VERIFY_EXPIRATION': False,
+    'JWT_AUTH_HEADER_PREFIX': 'JWT',
+}
+
 # drf
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
-    ]
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+    ),
+    'NON_FIELD_ERRORS_KEY': 'detail',
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
 }
+
+# cors
+CORS_ALLOWED_ORIGINS = (
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+)
+
+CORS_ALLOW_CREDENTIALS = True
+
+# CSRF_COOKIE_NAME = "csrftoken"
+
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Content-Type',
+    'X-CSRFToken',
+]
 
 # local settings
 

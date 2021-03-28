@@ -12,4 +12,6 @@ urlpatterns = [
     # scraping
     path('scrape/', api.scrape_api, name="scrape"),
     path('batch/<wanted_slug>/', api.batch_offer, name='offer_batch'),
+    # give csrftoken
+    path('csrf/', api.csrf, name="csrf"),
 ]

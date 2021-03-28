@@ -16,6 +16,10 @@ from django.template.loader import get_template
 # for batch of offer
 from django.utils import timezone
 
+# csrf
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
+
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
     domain = current_site.domain
@@ -168,6 +172,7 @@ class OfferingAPI(views.APIView):
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
 # heroku scrape
+# @csrf_exempt # for test
 def scrape_api(request):
     permission_classes = [permissions.AllowAny, ]
     
@@ -186,7 +191,18 @@ def scrape_api(request):
                     "sold": sold,
                 }
             }),
-            headers={'Content-Type': 'application/json'},
+            headers={
+                'Content-Type': 'application/json',
+            },
         )
         datas = r.json()
         return JsonResponse(datas, safe=False)
+
+def csrf(request):
+    permission_classes = [permissions.AllowAny, ]
+
+    token = get_token(request)
+    data = {
+        "token": token,
+    }
+    return JsonResponse(data, safe=False)

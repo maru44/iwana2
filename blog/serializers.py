@@ -27,5 +27,5 @@ class WantedSerializer(serializers.ModelSerializer):
         model = Wanted
         fields = [
             'slug', 'want_name', 'posted', 'is_gotten', 'want_intro',
-            'want_price', 'user', 'plat', 'is_accept_official',
+            'want_price', 'user', 'plat', 'is_accept_official', 'picture',
         ]

@@ -118,6 +118,23 @@ class WantedDetailAPI(views.APIView):
         wanted.delete()
         return response.Response(status=staus.HTTP_204_NO_CONTENT)
 
+def gotten_change(request, wanted_slug):
+    wanted = get_object_or_404(wanted, slug=wanted_slug)
+    if request.method == "GET":
+        user = self.request.user
+        data = {}
+        if wanted.is_gotten:
+            wanted.update(is_gotten=False)
+            data = {
+                "is_": 0,
+            }
+        else:
+            wanted.update(is_gotten=True)
+            data = {
+                "is_": 1,
+            }
+        return JsonResponse(data, safe=False)
+
 class OfferingAPI(views.APIView):
     def get_object(self, wanted_slug):
         try:
@@ -125,26 +142,14 @@ class OfferingAPI(views.APIView):
         except Wanted.DoesNotExist:
             raise Http404
 
-    # gotten change
-    def get(self, request, wanted_slug, format=None):
+    # offer list
+    def get(self, request, wanted_slug, formta=None):
         wanted = self.get_object(wanted_slug)
-        user = self.request.user
-        data = {}
-        if wanted.is_gotten == True:
-            #wanted.update(is_gotten=False)
-            wanted.is_gotten = False
-            wanted.save()
-            data = {
-                "is_": 0,
-            }
-        else:
-            #Wanted.objects.select_related
-            wanted.is_gotten = True
-            wanted.save()
-            data = {
-                "is_": 1,
-            }
-        return response.Response(data)
+        offers = Offer.objects.select_related('user').select_related('wanted')\
+            .filter(wanted=wanted).order_by('posted')
+        serializer = serializers.OfferSerializer(offers, many=True)
+        return response.Response(serializer.data)
+    
     
     # offer post
     def post(self, request, wanted_slug, format=None):

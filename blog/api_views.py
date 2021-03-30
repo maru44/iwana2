@@ -147,7 +147,7 @@ class OfferingAPI(views.APIView):
         wanted = self.get_object(wanted_slug)
         offers = Offer.objects.select_related('user').select_related('wanted')\
             .filter(wanted=wanted).order_by('posted')
-        serializer = serializers.OfferSerializer(offers, many=True)
+        serializer = OfferSerializer(offers, many=True)
         return response.Response(serializer.data)
     
     

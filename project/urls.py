@@ -8,7 +8,7 @@ urlpatterns = [
     path('', include('blog.urls')),
     path('user/', include('user.urls', namespace='user')),
     path('auth/', include('social_django.urls', namespace='auth')),
-    # path('api/user/', include('user.api_urls'), namespace='user_api'),
+    path('api/user/', include('user.api_urls', namespace='user_api')),
     path('api/', include('blog.api_urls', namespace='api')),
 ]
 

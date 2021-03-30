@@ -12,14 +12,6 @@ class PlatSerializer(serializers.ModelSerializer):
         model = Plat
         fields = ['name']
 
-class OfferSerializer(serializers.ModelSerializer):
-    user = UserSerializer(many=False, read_only=True)
-    class Meta:
-        model = Offer
-        fields = [
-            'offer_url', 'user', 'posted', 'wanted', 'is_noticed'
-        ]
-
 class WantedSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
     plat = PlatSerializer(many=True, read_only=True)
@@ -28,4 +20,12 @@ class WantedSerializer(serializers.ModelSerializer):
         fields = [
             'slug', 'want_name', 'posted', 'is_gotten', 'want_intro',
             'want_price', 'user', 'plat', 'is_accept_official', 'picture',
+        ]
+
+class OfferSerializer(serializers.ModelSerializer):
+    user = UserSerializer(many=False, read_only=True)
+    class Meta:
+        model = Offer
+        fields = [
+            'offer_url', 'user', 'posted', 'wanted', 'is_noticed'
         ]

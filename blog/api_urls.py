@@ -7,6 +7,8 @@ urlpatterns = [
     path('wanted/', api.WantedAPI.as_view(), name="wanted_api"),
     # wanted detail update delete
     path('wanted/<wanted_slug>/', api.WantedDetailAPI.as_view(), name="wanted_detail_api"),
+    # user wanted list post
+    path('wanted/u/<username>/', api.WantedUsersAPI.as_view()),
     # offer or change wanted offer
     path('offering/<wanted_slug>/', api.OfferingAPI.as_view(), name='offering'),
     # scraping

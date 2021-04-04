@@ -1,5 +1,6 @@
 from pathlib import Path
 import os
+import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -116,6 +117,8 @@ REST_FRAMEWORK = {
 JWT_AUTH = {
     'JWT_VERIFY_EXPIRATION': False,
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
+    'JWT_EXPIRTION_DELTA': datetime.timedelta(days=180),
+    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=365),
 }
 
 # cors
@@ -127,7 +130,7 @@ CORS_ALLOWED_ORIGINS = (
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF_COOKIE_NAME = "csrftoken"
-
+"""
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -141,6 +144,7 @@ CORS_ALLOW_HEADERS = [
     'Content-Type',
     'X-CSRFToken',
 ]
+"""
 
 # local settings
 

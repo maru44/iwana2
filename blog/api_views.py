@@ -68,7 +68,7 @@ def batch_offer(request, wanted_slug):
 class WantedAPI(views.APIView):
     def get(self, request, format=None):
 
-        PAGI_NUM = 2
+        PAGI_NUM = 5
 
         page = request.GET.get('page')
         
@@ -94,6 +94,7 @@ class WantedAPI(views.APIView):
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# detail of wanted
 class WantedDetailAPI(views.APIView):
     def get_object(self, wanted_slug):
         try:
@@ -118,23 +119,46 @@ class WantedDetailAPI(views.APIView):
         wanted.delete()
         return response.Response(status=staus.HTTP_204_NO_CONTENT)
 
-def gotten_change(request, wanted_slug):
-    wanted = get_object_or_404(wanted, slug=wanted_slug)
-    if request.method == "GET":
-        user = self.request.user
-        data = {}
-        if wanted.is_gotten:
-            wanted.update(is_gotten=False)
-            data = {
-                "is_": 0,
-            }
-        else:
-            wanted.update(is_gotten=True)
-            data = {
-                "is_": 1,
-            }
-        return JsonResponse(data, safe=False)
+# users wanted list
+class WantedUsersAPI(views.APIView):
+    def get_object(self, request, user):
+        PAGI_NUM = 5
 
+        page = request.GET.get('page')
+        
+        if page is not None:
+            int_page = int(page)
+        else:
+            int_page = 1
+
+        try:
+            return Wanted.objects.select_related('user')\
+                .prefetch_related('plat').filter(user=user)\
+                .order_by('-posted')[
+                    ((int_page - 1) * PAGI_NUM): int_page * PAGI_NUM + 1
+                ]
+        except Wanted.DoesNotExist:
+            raise Http404
+
+    def get_user(self, request, username):
+        try:
+            return User.objects.get(username=username)
+        except User.DoesNotExist:
+            raise Http404
+    
+    def get(self, request, username, format=None):
+        user = self.get_user(request, username)
+        wanted = self.get_object(request, user)
+        serializer = WantedSerializer(wanted, many=True)
+        user_serializer = UserSerializer(user, many=False)
+        return_data = {
+            'wanteds': serializer.data,
+            'user': user_serializer.data,
+        }
+        # return response.Response(serializer.data)
+        return JsonResponse(return_data, safe=False)
+
+# offering
 class OfferingAPI(views.APIView):
     def get_object(self, wanted_slug):
         try:
@@ -143,7 +167,7 @@ class OfferingAPI(views.APIView):
             raise Http404
 
     # offer list
-    def get(self, request, wanted_slug, formta=None):
+    def get(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
         offers = Offer.objects.select_related('user').select_related('wanted')\
             .filter(wanted=wanted).order_by('posted')
@@ -175,6 +199,26 @@ class OfferingAPI(views.APIView):
 
             return response.Response(serializer.data)
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+# change is_gotten
+def gotten_change(request, wanted_slug):
+    wanted = get_object_or_404(wanted, slug=wanted_slug)
+    if request.method == "GET":
+        user = self.request.user
+        data = {}
+        if wanted.is_gotten:
+            wanted.update(is_gotten=False)
+            data = {
+                "is_": 0,
+            }
+        else:
+            wanted.update(is_gotten=True)
+            data = {
+                "is_": 1,
+            }
+        return JsonResponse(data, safe=False)
+
 
 # heroku scrape
 # @csrf_exempt # for test

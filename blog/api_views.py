@@ -20,6 +20,14 @@ from django.utils import timezone
 from django.middleware.csrf import get_token
 from django.views.decorators.csrf import csrf_exempt
 
+# for id
+import random, string
+
+def gen_id():
+    random_ = [random.choice(string.ascii_letters + string.digits + '-' + '_') for i in range(8)]
+    id_ = ''.join(random_)
+    return id_
+
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
     domain = current_site.domain
@@ -87,9 +95,32 @@ class WantedAPI(views.APIView):
         return response.Response(serializer.data)
 
     def post(self, request, format=None):
+        req_data = request.data.copy()
+        print(req_data)
+
+        selected = []
+        if req_data.get('plat[]'):
+            selected = req_data.pop('plat[]')
+            print(selected)
+            # user_pk = req_data.pop('user_pk')
+
         serializer = WantedSerializer(data=request.data)
+
         if serializer.is_valid():
-            serializer.save()
+            try:
+                id_ = gen_id()
+                serializer.save(slug=id_)
+            except IntegrityError:
+                id_ = gen_id()
+                serializer.save(slug=id_)
+            except Exception as e:
+                print(e)
+
+            plats = Plat.objects.filter(name__in=selected)
+            print(plats)
+
+            want = Wanted.objects.get(slug=id_)
+            want.plat.set(plats)
 
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

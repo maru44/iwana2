@@ -115,6 +115,8 @@ REST_FRAMEWORK = {
 
 # drf fwt
 JWT_AUTH = {
+    'JWT_AUTH_COOKIE': 'iwana_user_token',
+    #'JWT_AUTH_COOKIE_SECURE': True, # 本番True
     'JWT_VERIFY_EXPIRATION': False,
     'JWT_AUTH_HEADER_PREFIX': 'JWT',
     'JWT_EXPIRTION_DELTA': datetime.timedelta(days=180),

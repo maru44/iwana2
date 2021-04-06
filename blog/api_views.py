@@ -23,10 +23,27 @@ from django.views.decorators.csrf import csrf_exempt
 # for id
 import random, string
 
+# user from jwt
+import jwt
+from django.core import serializers
+
 def gen_id():
     random_ = [random.choice(string.ascii_letters + string.digits + '-' + '_') for i in range(8)]
     id_ = ''.join(random_)
     return id_
+
+def user_id_from_jwt(token):
+    try:
+        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+        return payload['user_id']
+    except Exception as e:
+        print(e)
+    """
+    except jwt.ExpiredSignatureError as e:
+        return response.Response(serializers.serialize("json", {'error': 'Activations link expired'}), status=status.HTTP_400_BAD_REQUEST)
+    except jwt.exceptions.DecodeError as e:
+        return response.Response(serializers.serialize("json", {'error': 'Invalid Token'}), status=status.HTTP_400_BAD_REQUEST)
+    """
 
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
@@ -146,9 +163,13 @@ class WantedDetailAPI(views.APIView):
         return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, wanted_slug, format=None):
+        IWT = self.request.COOKIES.get('iwana_user_token')
+        user_id = user_id_from_jwt(IWT)
         wanted = self.get_object(wanted_slug)
-        wanted.delete()
-        return response.Response(status=staus.HTTP_204_NO_CONTENT)
+        if wanted.user.pk == user_id:
+            wanted.delete()
+            return response.Response(status=status.HTTP_204_NO_CONTENT)
+        return response.Response(status=stauts.HTTP_403_FORBIDDEN)
 
 # users wanted list
 class WantedUsersAPI(views.APIView):
@@ -231,20 +252,26 @@ class OfferingAPI(views.APIView):
             return response.Response(serializer.data)
         return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
 
+def test(request):
+    if request.method == "POST":
+        jwt_ = request.COOKIES.get('iwana_user_token')
+        user_id = user_id_from_jwt(jwt_)
+        return JsonResponse({"user": user_id}, safe=False)
 
 # change is_gotten
 def gotten_change(request, wanted_slug):
-    wanted = get_object_or_404(wanted, slug=wanted_slug)
+    wanted = get_object_or_404(Wanted, slug=wanted_slug)
     if request.method == "GET":
-        user = self.request.user
         data = {}
         if wanted.is_gotten:
-            wanted.update(is_gotten=False)
+            wanted.is_gotten = False
+            wanted.save()
             data = {
                 "is_": 0,
             }
         else:
-            wanted.update(is_gotten=True)
+            wanted.is_gotten = True
+            wanted.save()
             data = {
                 "is_": 1,
             }

@@ -10,7 +10,7 @@ class UserSerializer(serializers.ModelSerializer):
 class PlatSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plat
-        fields = ['name']
+        fields = ['name', 'slug']
 
 class WantedSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)

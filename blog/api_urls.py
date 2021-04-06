@@ -16,4 +16,8 @@ urlpatterns = [
     path('batch/<wanted_slug>/', api.batch_offer, name='offer_batch'),
     # give csrftoken
     path('csrf/', api.csrf, name="csrf"),
+    # change is_gotten
+    path('gotten/<wanted_slug>', api.gotten_change),
+    # test
+    path('test/', api.test),
 ]

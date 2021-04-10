@@ -34,8 +34,9 @@ class WantedSerializer(serializers.ModelSerializer):
 
 class OfferSerializer(serializers.ModelSerializer):
     user = UserSerializer(many=False, read_only=True)
+    # user_pk = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True)
     class Meta:
         model = Offer
         fields = [
-            'offer_url', 'user', 'posted', 'wanted', 'is_noticed'
+            'offer_url', 'user', 'posted', 'wanted', 'is_noticed',
         ]

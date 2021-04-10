@@ -6,7 +6,7 @@ from django.conf import settings
 from django.http import JsonResponse, Http404
 
 import jwt
-import json
+import json, requests
 
 from django.core import serializers
 
@@ -43,6 +43,7 @@ class ProfileAPIView(views.APIView):
             token = '.'.join(token_list)
             payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
             return User.objects.get(id=payload['user_id'])
+
         except jwt.ExpiredSignatureError as e:
             return response.Response({'error': 'Activations link expired'}, status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError as e:
@@ -57,6 +58,23 @@ class ProfileAPIView(views.APIView):
         user = self.get_object(token_list)
         serializer = ProfileSerializer(user)
         return response.Response(serializer.data)
+
+def refresh_token(request):
+    if request.method == "POST":
+        data = (request.data)
+        print(data)
+        r = requests.post(
+            '{0}://{1}/api/user/refresh/'.format(self.request.scheme, self.request.get_host()),
+            json.dumps({
+                "refresh": data['refresh'],
+            }),
+            headers={
+                'Content-Type': 'application/json',
+            },
+        )
+        res = r.json()
+        print(res)
+        return res
 
 class ProfileDetailView(views.APIView):
     def get_object(self, pk):
@@ -73,4 +91,3 @@ class ProfileDetailView(views.APIView):
             serializer.save()
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-

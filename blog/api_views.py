@@ -7,7 +7,7 @@ from .serializers import *
 from django.conf import settings
 import requests, json
 from django.contrib import messages
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponse
 
 # for notify mail
 from django.contrib.sites.shortcuts import get_current_site
@@ -37,7 +37,8 @@ def user_id_from_jwt(token):
         payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
         return payload['user_id']
     except Exception as e:
-        print(e)
+        # print(e, 'aaaa')
+        return None
     """
     except jwt.ExpiredSignatureError as e:
         return response.Response(serializers.serialize("json", {'error': 'Activations link expired'}), status=status.HTTP_400_BAD_REQUEST)
@@ -113,13 +114,9 @@ class WantedAPI(views.APIView):
 
     def post(self, request, format=None):
         req_data = request.data.copy()
-        print(req_data)
-
         selected = []
         if req_data.get('plat[]'):
             selected = req_data.pop('plat[]')
-            print(selected)
-            # user_pk = req_data.pop('user_pk')
 
         serializer = WantedSerializer(data=request.data)
 
@@ -156,11 +153,26 @@ class WantedDetailAPI(views.APIView):
         return response.Response(serializer.data)
 
     def put(self, request, wanted_slug, format=None):
+        IWT = self.request.COOKIES.get('iwana_user_token')
+        user_id = user_id_from_jwt(IWT)
+        
         wanted = self.get_object(wanted_slug)
-        if serializer.is_valid():
-            serializer.save()
-            return response.Response(serializer.data)
-        return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+
+        # platform
+        req_data = request.data.copy()
+        selected = []
+        if req_data.get('plat[]'):
+            selected = req_data.pop('plat[]')
+        plats = Plat.objects.filter(name__in=selected)
+        wanted.plat.set(plats)
+
+        if wanted.user.pk == user_id:
+            serializer = WantedSerializer(wanted, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return response.Response(serializer.data)
+            return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(status=stauts.HTTP_403_FORBIDDEN)
 
     def delete(self, request, wanted_slug, format=None):
         IWT = self.request.COOKIES.get('iwana_user_token')
@@ -226,31 +238,22 @@ class OfferingAPI(views.APIView):
         serializer = OfferSerializer(offers, many=True)
         return response.Response(serializer.data)
     
-    
     # offer post
     def post(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
-        user = self.request.user
+        IWT = self.request.COOKIES.get('iwana_user_token')
+        user_id = user_id_from_jwt(IWT)
+        print(user_id)
         serializer = OfferSerializer(data=request.data)
         if serializer.is_valid():
-            if user.is_authenticated:
+            if user_id is not None:
+                user = User.objects.get(pk=user_id)
                 serializer.save(wanted=wanted, user=user)
-                offer_user = user
-
-                # send notify with email rapidly
-                if not user.is_superuser:
-                    offer_mail(self.request, wanted, offer_user)
-                else:
-                    #offer_mail_batch(self.request, wanted, offer_user)
-                    pass
-
             else:
                 serializer.save(wanted=wanted)
-                offer_user = "アノニマスユーザー"
-
 
             return response.Response(serializer.data)
-        return response.Response(serializers.errors, status=status.HTTP_400_BAD_REQUEST)
+        return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 def test(request):
     if request.method == "POST":
@@ -279,7 +282,6 @@ def gotten_change(request, wanted_slug):
 
 
 # heroku scrape
-# @csrf_exempt # for test
 def scrape_api(request):
     permission_classes = [permissions.AllowAny, ]
     
@@ -289,6 +291,26 @@ def scrape_api(request):
         keyword = data["keyword"]
         category = data["category"]
         sold = data["sold"]
+        r = requests.post(
+            scrape_url,
+            json.dumps({
+                "keyword": keyword,
+                "narrowdown": {
+                    "category": category,
+                    "sold": sold,
+                }
+            }),
+            headers={
+                'Content-Type': 'application/json',
+            },
+        )
+        datas = r.json()
+        return JsonResponse(datas, safe=False)
+
+    elif request.method == "GET":
+        keyword = request.GET.get('keyword')
+        category = request.GET.get('category')
+        sold = request.GET.get('sold')
         r = requests.post(
             scrape_url,
             json.dumps({

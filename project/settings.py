@@ -1,6 +1,5 @@
 from pathlib import Path
 import os
-import datetime
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -107,20 +106,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # django jwt
+        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # django jwt
+        'rest_framework_simplejwt.authentication.JWTAuthentication', # simple jwt
     ),
     'NON_FIELD_ERRORS_KEY': 'detail',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-}
-
-# drf fwt
-JWT_AUTH = {
-    'JWT_AUTH_COOKIE': 'iwana_user_token',
-    #'JWT_AUTH_COOKIE_SECURE': True, # 本番True
-    'JWT_VERIFY_EXPIRATION': False,
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',
-    'JWT_EXPIRTION_DELTA': datetime.timedelta(days=180),
-    'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=365),
 }
 
 # cors

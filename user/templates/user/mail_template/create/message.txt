@@ -4,6 +4,6 @@
 以下のURLをクリックして会員登録を完了してください。
 
 URL:
-{{ protocol}}://{{ domain }}{% url 'user:register_complete' token %}
+{{ protocol}}://{{ domain }}/user/register/{{ token }}
 
 Iwana 公式

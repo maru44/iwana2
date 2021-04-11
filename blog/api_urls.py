@@ -20,4 +20,6 @@ urlpatterns = [
     path('gotten/<wanted_slug>', api.gotten_change),
     # test
     path('test/', api.test),
+    # inquiry
+    path('inquiry/', api.inquiry),
 ]

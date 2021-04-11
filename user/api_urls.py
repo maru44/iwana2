@@ -10,4 +10,8 @@ urlpatterns = [
     path('profile/', views.ProfileAPIView.as_view()),
     # change profile
     path('token/', views.UserInformationAPIView.as_view()),
+    # user auth register
+    path('register/', views.UserCreateAPIView.as_view()),
+    # complete register
+    path('register/<token>/', views.user_complete_api, name="complete"),
 ]

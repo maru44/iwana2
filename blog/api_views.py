@@ -241,8 +241,9 @@ class OfferingAPI(views.APIView):
     # offer post
     def post(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
-        IWT = self.request.COOKIES.get('iwana_user_token')
-        user_id = user_id_from_jwt(IWT)
+        # IWT = self.request.COOKIES.get('iwana_user_token') # for httpOnly
+        # user_id = user_id_from_jwt(IWT)
+        user_id = request.data.get('user')
         print(user_id)
         serializer = OfferSerializer(data=request.data)
         if serializer.is_valid():
@@ -335,3 +336,23 @@ def csrf(request):
         "token": token,
     }
     return JsonResponse(data, safe=False)
+
+def inquiry(request):
+    inquiryUrl = settings.INQ_URL_AWS
+    if request.method == "POST":
+        bod = json.loads(request.body)
+        data = {
+            "name": bod['name'],
+            "mail": bod['mail'],
+            "category": bod['category'],
+            "content": bod['content']
+        }
+        r = requests.post(
+            inquiryUrl,
+            json.dumps({
+                "OperationType": "PUT",
+                "Keys": data
+            }),
+            headers={'Content-Type': 'application/json'},
+        )
+        return JsonResponse({'status': r.status_code }, safe=False)

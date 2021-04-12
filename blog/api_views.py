@@ -103,6 +103,10 @@ class WantedAPI(views.APIView):
         else:
             int_page = 1
 
+        has_previous = False
+        if int_page > 1:
+            has_previous = True
+
         wanteds = Wanted.objects.select_related('user')\
             .prefetch_related('plat').order_by('-posted')[
                 ((int_page - 1) * PAGI_NUM):
@@ -194,6 +198,10 @@ class WantedUsersAPI(views.APIView):
             int_page = int(page)
         else:
             int_page = 1
+
+        has_previous = False
+        if int_page > 1:
+            has_previous = True
 
         try:
             return Wanted.objects.select_related('user')\

@@ -61,7 +61,7 @@ class ProfileAPIView(views.APIView):
         signature = request.GET.get("signature")
         token_list = [head, pay, signature]
         
-        user = self.get_object(token_list)
+        user = self.get_object(token_list) # ここに is_activeでの条件分岐を書く
         serializer = ProfileSerializer(user)
         return response.Response(serializer.data)
 

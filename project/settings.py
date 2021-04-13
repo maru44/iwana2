@@ -106,16 +106,11 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # django jwt
+        #'rest_framework_jwt.authentication.JSONWebTokenAuthentication', # django jwt
+        'rest_framework_simplejwt.authentication.JWTAuthentication', # simple jwt
     ),
     'NON_FIELD_ERRORS_KEY': 'detail',
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
-}
-
-# drf fwt
-JWT_AUTH = {
-    'JWT_VERIFY_EXPIRATION': False,
-    'JWT_AUTH_HEADER_PREFIX': 'JWT',
 }
 
 # cors
@@ -127,7 +122,7 @@ CORS_ALLOWED_ORIGINS = (
 CORS_ALLOW_CREDENTIALS = True
 
 # CSRF_COOKIE_NAME = "csrftoken"
-
+"""
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -141,6 +136,7 @@ CORS_ALLOW_HEADERS = [
     'Content-Type',
     'X-CSRFToken',
 ]
+"""
 
 # local settings
 

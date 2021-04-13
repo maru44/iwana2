@@ -45,7 +45,7 @@ class Wanted(models.Model):
 class Offer(models.Model):
     offer_url = models.CharField(_('オファーurl'), max_length=100)
     posted = models.DateTimeField(_('投稿日'), auto_now_add=True)
-    offer_mess = models.TextField(_('メッセージ'), max_length=400)
+    offer_mess = models.TextField(_('メッセージ'), max_length=400, blank=True, null=True)
 
     user = models.ForeignKey(User, blank=True, null=True, on_delete=models.SET_NULL)
     wanted = models.ForeignKey(Wanted, blank=True, null=True, on_delete=models.SET_NULL)

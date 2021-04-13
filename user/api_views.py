@@ -62,8 +62,10 @@ class ProfileAPIView(views.APIView):
         token_list = [head, pay, signature]
         
         user = self.get_object(token_list) # ここに is_activeでの条件分岐を書く
-        serializer = ProfileSerializer(user)
-        return response.Response(serializer.data)
+        if user.is_active:
+            serializer = ProfileSerializer(user)
+            return response.Response(serializer.data)
+        return None
 
 def refresh_token(request):
     if request.method == "POST":
@@ -129,7 +131,7 @@ class UserCreateAPIView(views.APIView):
             message_template = get_template('user/mail_template/create/message.txt')
             message = message_template.render(context)
             user.email_user(subject, message, from_email)
-            #return JsonResponse({'status': 200}, safe=False)
+            # return JsonResponse({'status': 200}, safe=False)
             return JsonResponse(res, safe=False)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -143,30 +145,23 @@ def user_complete_api(request, token):
         user_pk = loads(token, max_age=timeout_seconds)
     # 期限切れ
     except SignatureExpired:
-        return JsonResponse({'status': 400, 'message': 'expired'}, safe=False)
+        return JsonResponse({'status': 400, 'message': 'Token expired'}, safe=False)
     # tokenが間違っている
     except BadSignature:
-        return JsonResponse({'status': 400, 'message': 'invalid'}, safe=False)
+        return JsonResponse({'status': 400, 'message': 'Invalid token'}, safe=False)
 
     else:
         try:
             user = User.objects.get(pk=user_pk)
         except User.DoesNotExist:
-            return JsonResponse({'status': 400}, safe=False)
+            return JsonResponse({'status': 400, 'message': 'Invalid token'}, safe=False)
         else:
             if not user.is_active:
                 # 問題なければ本登録とする
                 user.is_active = True
                 user.save()
-                """
-                r = requests.post(
-                    '{}/api/user/login/'.format(settings.BACKEND_URL),
-                    {'username': user.username, 'password': user.password}
-                )
-                res = r.json()
-                print(res)
-                """
-                # password が取れないから無理
-                return JsonResponse({'status': 200, 'username': user.username}, safe=False)
 
-    return JsonResponse({'status': 400}, safe=False)
+                # password が取れないから無理
+                return JsonResponse({'status': 200, 'message': 'success', 'username': user.username}, safe=False)
+
+    return JsonResponse({'status': 400, 'message': 'Invalid token'}, safe=False)

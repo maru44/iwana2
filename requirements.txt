@@ -12,6 +12,7 @@ django-debug-toolbar==3.2
 django-storages==1.11.1
 djangorestframework==3.12.2
 djangorestframework-jwt==1.11.0
+djangorestframework-simplejwt==4.4.0
 idna==2.10
 jmespath==0.10.0
 oauthlib==3.1.0

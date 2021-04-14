@@ -181,7 +181,8 @@ class WantedDetailAPI(views.APIView):
         return response.Response(status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, wanted_slug, format=None):
-        IWT = self.request.COOKIES.get('iwana_user_token')
+        IWT = self.request.META.get('HTTP_AUTHORIZATION')
+        IWT = IWT.replace('Bearer ', '')
         user_id = user_id_from_jwt(IWT)
         print(user_id)
         wanted = self.get_object(wanted_slug)

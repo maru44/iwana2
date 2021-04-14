@@ -111,7 +111,6 @@ class UserCreateAPIView(views.APIView):
 
         if serializer.is_valid():
             user = serializer.create(password, serializer.data)
-            print(user)
             r = requests.post(
                 '{}/api/user/login/'.format(settings.BACKEND_URL),
                 {'username': user.username, 'password': password}

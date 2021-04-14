@@ -35,6 +35,7 @@ def gen_id():
 def user_id_from_jwt(token):
     try:
         payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+        print(payload)
         return payload['user_id']
     except Exception as e:
         # print(e, 'aaaa')
@@ -158,6 +159,7 @@ class WantedDetailAPI(views.APIView):
 
     def put(self, request, wanted_slug, format=None):
         IWT = self.request.COOKIES.get('iwana_user_token')
+        print(IWT)
         user_id = user_id_from_jwt(IWT)
         print(user_id)
         

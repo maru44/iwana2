@@ -7,7 +7,7 @@ urlpatterns = [
     path('login/', jwt_views.TokenObtainPairView.as_view()),
     path('refresh/', jwt_views.TokenRefreshView.as_view()),
     path('profile/<pk>/', views.ProfileDetailView.as_view()),
-    path('profile/', views.ProfileAPIView.as_view()),
+    path('profile/', views.UserAPIView.as_view()),
     # change profile
     path('token/', views.UserInformationAPIView.as_view()),
     # user auth register

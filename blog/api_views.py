@@ -159,6 +159,7 @@ class WantedDetailAPI(views.APIView):
     def put(self, request, wanted_slug, format=None):
         IWT = self.request.COOKIES.get('iwana_user_token')
         user_id = user_id_from_jwt(IWT)
+        print(user_id)
         
         wanted = self.get_object(wanted_slug)
 
@@ -181,6 +182,7 @@ class WantedDetailAPI(views.APIView):
     def delete(self, request, wanted_slug, format=None):
         IWT = self.request.COOKIES.get('iwana_user_token')
         user_id = user_id_from_jwt(IWT)
+        print(user_id)
         wanted = self.get_object(wanted_slug)
         if wanted.user.pk == user_id:
             wanted.delete()

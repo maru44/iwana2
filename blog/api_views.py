@@ -176,7 +176,7 @@ class WantedDetailAPI(views.APIView):
                 serializer.save()
                 return response.Response(serializer.data)
             return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
-        return response.Response(status=stauts.HTTP_403_FORBIDDEN)
+        return response.Response(status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, wanted_slug, format=None):
         IWT = self.request.COOKIES.get('iwana_user_token')
@@ -185,7 +185,7 @@ class WantedDetailAPI(views.APIView):
         if wanted.user.pk == user_id:
             wanted.delete()
             return response.Response(status=status.HTTP_204_NO_CONTENT)
-        return response.Response(status=stauts.HTTP_403_FORBIDDEN)
+        return response.Response(status=status.HTTP_403_FORBIDDEN)
 
 # users wanted list
 class WantedUsersAPI(views.APIView):

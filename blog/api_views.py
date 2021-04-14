@@ -158,6 +158,7 @@ class WantedDetailAPI(views.APIView):
         return response.Response(serializer.data)
 
     def put(self, request, wanted_slug, format=None):
+        print(self.request.COOKIES)
         IWT = self.request.COOKIES.get('iwana_user_token')
         print(IWT)
         user_id = user_id_from_jwt(IWT)

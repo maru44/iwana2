@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from user.models import User
 from rest_framework import views, status, permissions, response
-from .serializers import *
+from .serializers import UserSerializer, ProfileSerializer
 from django.conf import settings
 from django.http import JsonResponse, Http404
 
@@ -37,12 +37,12 @@ class UserInformationAPIView(views.APIView):
         
         #user_id = self.get_object(token_list)
         #data = {"uid": self.get_object(token_list)}
-        # serializer = ProfileSerialzier(user)
+        # serializer = ProfileSerializer(user)
         # return response.Response(serializer.data)
         data = self.get_object(token_list)
         return JsonResponse(data, safe=False)
             
-class ProfileAPIView(views.APIView):
+class UserAPIView(views.APIView):
     def get_object(self, token_list):
         try:
             # token = self.request.get('iwana_user_token')
@@ -63,7 +63,7 @@ class ProfileAPIView(views.APIView):
         
         user = self.get_object(token_list) # ここに is_activeでの条件分岐を書く
         if user.is_active:
-            serializer = ProfileSerializer(user)
+            serializer = UserSerializer(user)
             return response.Response(serializer.data)
         return None
 
@@ -106,7 +106,7 @@ class UserCreateAPIView(views.APIView):
             User.objects.filter(email=data['email'], is_active=False).delete()
         if User.objects.filter(username=data['username'], is_active=False).exists():
             User.objects.filter(email=data['username'], is_active=False).delete()
-        serializer = ProfileSerializer(data=data)
+        serializer = UserSerializer(data=data)
         password = data['password']
 
         if serializer.is_valid():

@@ -253,8 +253,6 @@ class OfferingAPI(views.APIView):
     # offer post
     def post(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
-        # IWT = self.request.COOKIES.get('iwana_user_token') # for httpOnly
-        # user_id = user_id_from_jwt(IWT)
         user_id = request.data.get('user')
         print(user_id)
         serializer = OfferSerializer(data=request.data)

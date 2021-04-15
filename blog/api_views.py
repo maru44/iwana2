@@ -357,6 +357,7 @@ def inquiry(request):
             "category": bod['category'],
             "content": bod['content']
         }
+        print(data)
         r = requests.post(
             inquiryUrl,
             json.dumps({

@@ -95,7 +95,7 @@ def batch_offer(request, wanted_slug):
 class WantedAPI(views.APIView):
     def get(self, request, format=None):
 
-        PAGI_NUM = 5
+        PAGI_NUM = 10
 
         page = request.GET.get('page')
         
@@ -194,7 +194,7 @@ class WantedDetailAPI(views.APIView):
 # users wanted list
 class WantedUsersAPI(views.APIView):
     def get_object(self, request, user):
-        PAGI_NUM = 5
+        PAGI_NUM = 10
 
         page = request.GET.get('page')
         

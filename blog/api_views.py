@@ -198,6 +198,7 @@ class WantedDetailAPI(views.APIView):
 
     def delete(self, request, wanted_slug, format=None):
         IWT = self.request.META.get("HTTP_AUTHORIZATION")
+        print(IWT)
         IWT = IWT.replace("Bearer ", "")
         user_id = user_id_from_jwt(IWT)
         print(user_id)

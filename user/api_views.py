@@ -76,7 +76,6 @@ class UserAPIView(views.APIView):
 def refresh_token(request):
     if request.method == "POST":
         data = request.data
-        print(data)
         r = requests.post(
             "{0}://{1}/api/user/refresh/".format(request.scheme, request.get_host()),
             json.dumps(
@@ -89,7 +88,6 @@ def refresh_token(request):
             },
         )
         res = r.json()
-        print(res)
         return res
 
 
@@ -111,7 +109,7 @@ class ProfileDetailView(views.APIView):
 
 class UserCreateAPIView(views.APIView):
     def post(self, request, format=None):
-        data = request.data
+        data = self.request.data
         if User.objects.filter(email=data["email"], is_active=False).exists():
             User.objects.filter(email=data["email"], is_active=False).delete()
         if User.objects.filter(username=data["username"], is_active=False).exists():

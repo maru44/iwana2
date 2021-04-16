@@ -137,3 +137,5 @@ profile/
 
 #seed files
 initial_data/
+
+.vscode/settings.json

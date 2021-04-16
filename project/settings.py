@@ -113,6 +113,6 @@ REST_FRAMEWORK = {
 # local settings
 
 try:
-    from .local_settings import *
+    from .production_settings import *
 except ImportError:
     pass

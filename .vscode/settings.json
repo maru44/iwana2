@@ -5,7 +5,6 @@
         "editor.detectIndentation": true,
         "editor.tabSize": 4
     },
-    "python.pythonPath": "../venv/bin/python3",
     "files.watcherExclude": {
         "**/venv/**": true
     },

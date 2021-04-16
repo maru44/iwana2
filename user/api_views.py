@@ -22,12 +22,9 @@ class UserInformationAPIView(views.APIView):
             payload = jwt.decode(
                 jwt=token, key=settings.SECRET_KEY, algorithms=["HS256"]
             )
-            # return User.objects.get(id=payload['user_id'])
-            # return {"uid": payload['user_id']}
             return payload["user_id"]
         except jwt.ExpiredSignatureError:
             return JsonResponse({"error": "Expired access token"}, safe=False)
-            # return response.Response(serializers.serialize("json", {'error': 'Activations link expired'}), status=status.HTTP_400_BAD_REQUEST)
         except jwt.exceptions.DecodeError:
             return response.Response(
                 serializers.serialize("json", {"error": "Invalid Token"}),
@@ -40,11 +37,7 @@ class UserInformationAPIView(views.APIView):
         signature = request.GET.get("signature")
         token_list = [head, pay, signature]
 
-        # user_id = self.get_object(token_list)
-        # data = {"uid": self.get_object(token_list)}
-        # serializer = ProfileSerializer(user)
-        # return response.Response(serializer.data)
-        data = self.get_object(token_list)
+        data = {"uid": self.get_object(token_list)}
         return JsonResponse(data, safe=False)
 
 

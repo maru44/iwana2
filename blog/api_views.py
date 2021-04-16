@@ -1,44 +1,52 @@
 from django.shortcuts import get_object_or_404
-from .models import *
+from .models import Wanted, Plat, Offer
 from user.models import User
 from rest_framework import views, status, permissions, response
-from .serializers import *
-
+from .serializers import (
+    UserSerializer,
+    WantedSerializer,
+    OfferSerializer,
+)
 from django.conf import settings
-import requests, json
-from django.contrib import messages
-from django.http import JsonResponse, Http404, HttpResponse
+import requests
+import json
+from django.http import JsonResponse, Http404
 
 # for notify mail
 from django.contrib.sites.shortcuts import get_current_site
 from django.template.loader import get_template
 
 # for batch of offer
-from django.utils import timezone
+# from django.utils import timezone
 
 # csrf
 from django.middleware.csrf import get_token
-from django.views.decorators.csrf import csrf_exempt
+
+# from django.views.decorators.csrf import csrf_exempt
 
 # for id
-import random, string
+import random
+import string
 
 # user from jwt
 import jwt
-from django.core import serializers
+
 
 def gen_id():
-    random_ = [random.choice(string.ascii_letters + string.digits + '-' + '_') for i in range(8)]
-    id_ = ''.join(random_)
+    random_ = [
+        random.choice(string.ascii_letters + string.digits + "-" + "_")
+        for i in range(8)
+    ]
+    id_ = "".join(random_)
     return id_
+
 
 def user_id_from_jwt(token):
     try:
-        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=['HS256'])
+        payload = jwt.decode(jwt=token, key=settings.SECRET_KEY, algorithms=["HS256"])
         print(payload)
-        return payload['user_id']
-    except Exception as e:
-        # print(e, 'aaaa')
+        return payload["user_id"]
+    except Exception:
         return None
     """
     except jwt.ExpiredSignatureError as e:
@@ -47,26 +55,31 @@ def user_id_from_jwt(token):
         return response.Response(serializers.serialize("json", {'error': 'Invalid Token'}), status=status.HTTP_400_BAD_REQUEST)
     """
 
+
 def offer_mail(req, obj, offer_user):
     current_site = get_current_site(req)
     domain = current_site.domain
     context = {
         "user": obj.user,
-        'protocol': req.scheme,
-        'domain': domain,
-        'slug': obj.slug,
-        'offeruser': offer_user,
-        #'offer': offer_url,
+        "protocol": req.scheme,
+        "domain": domain,
+        "slug": obj.slug,
+        "offeruser": offer_user,
+        # 'offer': offer_url,
     }
     from_email = settings.FROM_EMAIL
-    subject_template = get_template('blog/mail_template/offer_notify/subject.txt')
+    subject_template = get_template("blog/mail_template/offer_notify/subject.txt")
     subject = subject_template.render(context)
-    message_template = get_template('blog/mail_template/offer_notify/message.txt')
+    message_template = get_template("blog/mail_template/offer_notify/message.txt")
     message = message_template.render(context)
     obj.notify_mail(subject, message, from_email)
 
+
+"""
 def batch_offer(request, wanted_slug):
-    permission_classes = [permission.AllowAny, ]
+    permission_classes = [
+        permissions.AllowAny,
+    ]
 
     api_url = settings.AWS_BATCH_URL
     if request.method == "POST":
@@ -81,47 +94,47 @@ def batch_offer(request, wanted_slug):
 
         now = timezone.now()
         dt = strftime("%Y%m%d%H%M%s")
-        
+
         r = requests.post(
             api_url,
-            json.dumps({
-                "wanted": wanted,
-                "from_user": fron_user,
-                "dt": dt,
-            }),
-            headers={'Content-Type': 'applications/json'},
+            json.dumps(
+                {
+                    "wanted": wanted,
+                    "from_user": fron_user,
+                    "dt": dt,
+                }
+            ),
+            headers={"Content-Type": "applications/json"},
         )
+"""
+
 
 class WantedAPI(views.APIView):
     def get(self, request, format=None):
 
         PAGI_NUM = 10
 
-        page = request.GET.get('page')
-        
+        page = request.GET.get("page")
+
         if page is not None:
             int_page = int(page)
         else:
             int_page = 1
 
-        has_previous = False
-        if int_page > 1:
-            has_previous = True
+        wanteds = (
+            Wanted.objects.select_related("user")
+            .prefetch_related("plat")
+            .order_by("-posted")[((int_page - 1) * PAGI_NUM) : int_page * PAGI_NUM + 1]
+        )
 
-        wanteds = Wanted.objects.select_related('user')\
-            .prefetch_related('plat').order_by('-posted')[
-                ((int_page - 1) * PAGI_NUM):
-                int_page * PAGI_NUM + 1
-            ]
-        
         serializer = WantedSerializer(wanteds, many=True)
         return response.Response(serializer.data)
 
     def post(self, request, format=None):
         req_data = request.data.copy()
         selected = []
-        if req_data.get('plat[]'):
-            selected = req_data.pop('plat[]')
+        if req_data.get("plat[]"):
+            selected = req_data.pop("plat[]")
 
         serializer = WantedSerializer(data=request.data)
 
@@ -144,6 +157,7 @@ class WantedAPI(views.APIView):
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 # detail of wanted
 class WantedDetailAPI(views.APIView):
     def get_object(self, wanted_slug):
@@ -158,17 +172,17 @@ class WantedDetailAPI(views.APIView):
         return response.Response(serializer.data)
 
     def put(self, request, wanted_slug, format=None):
-        IWT = self.request.META.get('HTTP_AUTHORIZATION')
-        IWT = IWT.replace('Bearer ', '')
+        IWT = self.request.META.get("HTTP_AUTHORIZATION")
+        IWT = IWT.replace("Bearer ", "")
         user_id = user_id_from_jwt(IWT)
-        
+
         wanted = self.get_object(wanted_slug)
 
         # platform
         req_data = request.data.copy()
         selected = []
-        if req_data.get('plat[]'):
-            selected = req_data.pop('plat[]')
+        if req_data.get("plat[]"):
+            selected = req_data.pop("plat[]")
         plats = Plat.objects.filter(name__in=selected)
         wanted.plat.set(plats)
 
@@ -177,12 +191,14 @@ class WantedDetailAPI(views.APIView):
             if serializer.is_valid():
                 serializer.save()
                 return response.Response(serializer.data)
-            return response.Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+            return response.Response(
+                serializer.error, status=status.HTTP_400_BAD_REQUEST
+            )
         return response.Response(status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, wanted_slug, format=None):
-        IWT = self.request.META.get('HTTP_AUTHORIZATION')
-        IWT = IWT.replace('Bearer ', '')
+        IWT = self.request.META.get("HTTP_AUTHORIZATION")
+        IWT = IWT.replace("Bearer ", "")
         user_id = user_id_from_jwt(IWT)
         print(user_id)
         wanted = self.get_object(wanted_slug)
@@ -191,28 +207,28 @@ class WantedDetailAPI(views.APIView):
             return response.Response(status=status.HTTP_204_NO_CONTENT)
         return response.Response(status=status.HTTP_403_FORBIDDEN)
 
+
 # users wanted list
 class WantedUsersAPI(views.APIView):
     def get_object(self, request, user):
         PAGI_NUM = 10
 
-        page = request.GET.get('page')
-        
+        page = request.GET.get("page")
+
         if page is not None:
             int_page = int(page)
         else:
             int_page = 1
 
-        has_previous = False
-        if int_page > 1:
-            has_previous = True
-
         try:
-            return Wanted.objects.select_related('user')\
-                .prefetch_related('plat').filter(user=user)\
-                .order_by('-posted')[
-                    ((int_page - 1) * PAGI_NUM): int_page * PAGI_NUM + 1
+            return (
+                Wanted.objects.select_related("user")
+                .prefetch_related("plat")
+                .filter(user=user)
+                .order_by("-posted")[
+                    ((int_page - 1) * PAGI_NUM) : int_page * PAGI_NUM + 1
                 ]
+            )
         except Wanted.DoesNotExist:
             raise Http404
 
@@ -221,18 +237,19 @@ class WantedUsersAPI(views.APIView):
             return User.objects.get(username=username)
         except User.DoesNotExist:
             raise Http404
-    
+
     def get(self, request, username, format=None):
         user = self.get_user(request, username)
         wanted = self.get_object(request, user)
         serializer = WantedSerializer(wanted, many=True)
         user_serializer = UserSerializer(user, many=False)
         return_data = {
-            'wanteds': serializer.data,
-            'user': user_serializer.data,
+            "wanteds": serializer.data,
+            "user": user_serializer.data,
         }
         # return response.Response(serializer.data)
         return JsonResponse(return_data, safe=False)
+
 
 # offering
 class OfferingAPI(views.APIView):
@@ -245,15 +262,19 @@ class OfferingAPI(views.APIView):
     # offer list
     def get(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
-        offers = Offer.objects.select_related('user').select_related('wanted')\
-            .filter(wanted=wanted).order_by('posted')
+        offers = (
+            Offer.objects.select_related("user")
+            .select_related("wanted")
+            .filter(wanted=wanted)
+            .order_by("posted")
+        )
         serializer = OfferSerializer(offers, many=True)
         return response.Response(serializer.data)
-    
+
     # offer post
     def post(self, request, wanted_slug, format=None):
         wanted = self.get_object(wanted_slug)
-        user_id = request.data.get('user')
+        user_id = request.data.get("user")
         print(user_id)
         serializer = OfferSerializer(data=request.data)
         if serializer.is_valid():
@@ -266,11 +287,13 @@ class OfferingAPI(views.APIView):
             return response.Response(serializer.data)
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 def test(request):
     if request.method == "POST":
-        jwt_ = request.COOKIES.get('iwana_user_token')
+        jwt_ = request.COOKIES.get("iwana_user_token")
         user_id = user_id_from_jwt(jwt_)
         return JsonResponse({"user": user_id}, safe=False)
+
 
 # change is_gotten
 def gotten_change(request, wanted_slug):
@@ -294,8 +317,10 @@ def gotten_change(request, wanted_slug):
 
 # heroku scrape
 def scrape_api(request):
-    permission_classes = [permissions.AllowAny, ]
-    
+    permission_classes = [
+        permissions.AllowAny,
+    ]
+
     scrape_url = settings.SCRAPE_HEROKU
     if request.method == "POST":
         data = json.loads(request.body)
@@ -304,42 +329,49 @@ def scrape_api(request):
         sold = data["sold"]
         r = requests.post(
             scrape_url,
-            json.dumps({
-                "keyword": keyword,
-                "narrowdown": {
-                    "category": category,
-                    "sold": sold,
+            json.dumps(
+                {
+                    "keyword": keyword,
+                    "narrowdown": {
+                        "category": category,
+                        "sold": sold,
+                    },
                 }
-            }),
+            ),
             headers={
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         )
         datas = r.json()
         return JsonResponse(datas, safe=False)
 
     elif request.method == "GET":
-        keyword = request.GET.get('keyword')
-        category = request.GET.get('category')
-        sold = request.GET.get('sold')
+        keyword = request.GET.get("keyword")
+        category = request.GET.get("category")
+        sold = request.GET.get("sold")
         r = requests.post(
             scrape_url,
-            json.dumps({
-                "keyword": keyword,
-                "narrowdown": {
-                    "category": category,
-                    "sold": sold,
+            json.dumps(
+                {
+                    "keyword": keyword,
+                    "narrowdown": {
+                        "category": category,
+                        "sold": sold,
+                    },
                 }
-            }),
+            ),
             headers={
-                'Content-Type': 'application/json',
+                "Content-Type": "application/json",
             },
         )
         datas = r.json()
         return JsonResponse(datas, safe=False)
 
+
 def csrf(request):
-    permission_classes = [permissions.AllowAny, ]
+    permission_classes = [
+        permissions.AllowAny,
+    ]
 
     token = get_token(request)
     data = {
@@ -347,23 +379,21 @@ def csrf(request):
     }
     return JsonResponse(data, safe=False)
 
+
 def inquiry(request):
     inquiryUrl = settings.INQ_URL_AWS
     if request.method == "POST":
         bod = json.loads(request.body)
         data = {
-            "name": bod['name'],
-            "mail": bod['mail'],
-            "category": bod['category'],
-            "content": bod['content']
+            "name": bod["name"],
+            "mail": bod["mail"],
+            "category": bod["category"],
+            "content": bod["content"],
         }
         print(data)
         r = requests.post(
             inquiryUrl,
-            json.dumps({
-                "OperationType": "PUT",
-                "Keys": data
-            }),
-            headers={'Content-Type': 'application/json'},
+            json.dumps({"OperationType": "PUT", "Keys": data}),
+            headers={"Content-Type": "application/json"},
         )
-        return JsonResponse({'status': r.status_code }, safe=False)
+        return JsonResponse({"status": r.status_code}, safe=False)

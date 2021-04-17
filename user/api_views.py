@@ -126,11 +126,13 @@ class UserCreateAPIView(views.APIView):
 
         if serializer.is_valid():
             user = serializer.create(password, serializer.data)
+            """
             r = requests.post(
                 "{}/api/user/login/".format(settings.BACKEND_URL),
                 {"username": user.username, "password": password},
             )
             res = r.json()
+            """
             user.is_active = False
             user.save()
 
@@ -146,8 +148,8 @@ class UserCreateAPIView(views.APIView):
             message_template = get_template("user/mail_template/create/message.txt")
             message = message_template.render(context)
             user.email_user(subject, message, from_email)
-            # return JsonResponse({'status': 200}, safe=False)
-            return JsonResponse(res, safe=False)
+            # return JsonResponse(res, safe=False)
+            return JsonResponse({"status": 200}, safe=False)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

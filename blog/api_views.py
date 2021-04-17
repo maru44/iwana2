@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 from .models import Wanted, Plat, Offer
 from user.models import User
-from rest_framework import views, status, permissions, response
+from rest_framework import views, status, response
 from .serializers import (
     UserSerializer,
     WantedSerializer,

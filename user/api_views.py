@@ -147,8 +147,7 @@ class UserCreateAPIView(views.APIView):
             message = message_template.render(context)
             user.email_user(subject, message, from_email)
             # return JsonResponse({'status': 200}, safe=False)
-            # return JsonResponse(res, safe=False)
-            return JsonResponse({"status": 200}, safe=False)
+            return JsonResponse(res, safe=False)
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

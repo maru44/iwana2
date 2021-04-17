@@ -14,7 +14,7 @@ import requests
 from django.core import serializers
 from django.template.loader import get_template
 
-from django.views.generic.base import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 
 

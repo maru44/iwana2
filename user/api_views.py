@@ -14,8 +14,8 @@ import requests
 from django.core import serializers
 from django.template.loader import get_template
 
-from django.views.decorators.csrf import csrf_exempt
-from django.utils.decorators import method_decorator
+# from django.views.decorators.csrf import csrf_exempt
+# from django.utils.decorators import method_decorator
 
 
 class UserInformationAPIView(views.APIView):
@@ -114,23 +114,25 @@ class ProfileDetailView(views.APIView):
 
 
 class UserCreateAPIView(views.APIView):
-    @method_decorator(csrf_exempt)
+    # @method_decorator(csrf_exempt)
     def post(self, request, format=None):
         data = self.request.data
         if User.objects.filter(email=data["email"], is_active=False).exists():
             User.objects.filter(email=data["email"], is_active=False).delete()
         if User.objects.filter(username=data["username"], is_active=False).exists():
-            User.objects.filter(email=data["username"], is_active=False).delete()
+            User.objects.filter(username=data["username"], is_active=False).delete()
         serializer = UserSerializer(data=data)
         password = data["password"]
 
         if serializer.is_valid():
             user = serializer.create(password, serializer.data)
+            """
             r = requests.post(
                 "{}/api/user/login/".format(settings.BACKEND_URL),
                 {"username": user.username, "password": password},
             )
             res = r.json()
+            """
             user.is_active = False
             user.save()
 

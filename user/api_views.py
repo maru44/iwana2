@@ -14,6 +14,9 @@ import requests
 from django.core import serializers
 from django.template.loader import get_template
 
+from django.views.generic.base import csrf_exempt
+from django.utils.decorators import method_decorator
+
 
 class UserInformationAPIView(views.APIView):
     def get_object(self, token_list):
@@ -41,6 +44,7 @@ class UserInformationAPIView(views.APIView):
         return JsonResponse(data, safe=False)
 
 
+# login処理
 class UserAPIView(views.APIView):
     def get_object(self, token_list):
         try:
@@ -59,6 +63,8 @@ class UserAPIView(views.APIView):
             return response.Response(
                 {"error": "Invalid Token"}, status=status.HTTP_400_BAD_REQUEST
             )
+        except User.DoesNotExist:
+            return response.Response({"error": "user does not exists"})
 
     def get(self, request, format=None):
         head = request.GET.get("head")
@@ -108,6 +114,7 @@ class ProfileDetailView(views.APIView):
 
 
 class UserCreateAPIView(views.APIView):
+    @method_decorator(csrf_exempt)
     def post(self, request, format=None):
         data = self.request.data
         if User.objects.filter(email=data["email"], is_active=False).exists():

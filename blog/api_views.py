@@ -316,10 +316,6 @@ def gotten_change(request, wanted_slug):
 
 # heroku scrape
 def scrape_api(request):
-    permission_classes = [
-        permissions.AllowAny,
-    ]
-
     scrape_url = settings.SCRAPE_HEROKU
     if request.method == "POST":
         data = json.loads(request.body)
@@ -368,10 +364,6 @@ def scrape_api(request):
 
 
 def csrf(request):
-    permission_classes = [
-        permissions.AllowAny,
-    ]
-
     token = get_token(request)
     data = {
         "token": token,

@@ -8,8 +8,6 @@ from django.http import JsonResponse, Http404
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 
 import jwt
-import json
-import requests
 
 from django.core import serializers
 from django.template.loader import get_template
@@ -89,24 +87,6 @@ class UserAPIView(views.APIView):
             user.save()
             return JsonResponse({"status": 200}, safe=False)
         return None
-
-
-def refresh_token(request):
-    if request.method == "POST":
-        data = request.data
-        r = requests.post(
-            "{0}://{1}/api/user/refresh/".format(request.scheme, request.get_host()),
-            json.dumps(
-                {
-                    "refresh": data["refresh"],
-                }
-            ),
-            headers={
-                "Content-Type": "application/json",
-            },
-        )
-        res = r.json()
-        return res
 
 
 class ProfileDetailView(views.APIView):

@@ -19,7 +19,7 @@ from django.template.loader import get_template
 
 
 class UserInformationAPIView(views.APIView):
-    def get_object(self, token_list):
+    def get_id(self, token_list):
         try:
             token = ".".join(token_list)
             payload = jwt.decode(
@@ -40,7 +40,7 @@ class UserInformationAPIView(views.APIView):
         signature = request.GET.get("signature")
         token_list = [head, pay, signature]
 
-        data = {"uid": self.get_object(token_list)}
+        data = {"uid": self.get_id(token_list)}
         return JsonResponse(data, safe=False)
 
 
@@ -76,6 +76,18 @@ class UserAPIView(views.APIView):
         if user.is_active:
             serializer = UserSerializer(user)
             return response.Response(serializer.data)
+        return None
+
+    # change is_active false
+    def put(self, request, format=None):
+        IWT = self.request.META.get("HTTP_AUTHORIZATION")
+        IWT = IWT.replace("Bearer ", "")
+        token_list = IWT.split(".")
+        user = self.get_object(token_list)
+        if user.is_active:
+            user.is_active = False
+            user.save()
+            return JsonResponse({"status": 200}, safe=False)
         return None
 
 
@@ -133,7 +145,7 @@ class UserCreateAPIView(views.APIView):
             )
             res = r.json()
             """
-            user.is_active = False
+            user.is_active = True
             user.save()
 
             context = {
@@ -153,7 +165,8 @@ class UserCreateAPIView(views.APIView):
 
         return response.Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request, pk, format=None):
+    # change is_activate
+    def put(self, request, format=None):
         pass
 
 
@@ -179,7 +192,6 @@ def user_complete_api(request, token):
                 user.is_active = True
                 user.save()
 
-                # password が取れないから無理
                 return JsonResponse(
                     {"status": 200, "message": "success", "username": user.username},
                     safe=False,

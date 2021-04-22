@@ -2,7 +2,7 @@ from user.models import User
 from rest_framework import views, status, response
 from .serializers import UserSerializer, ProfileSerializer
 from django.conf import settings
-from django.http import JsonResponse, Http404
+from django.http import JsonResponse, Http404, HttpResponseRedirect
 
 # auth
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
@@ -11,6 +11,9 @@ import jwt
 
 from django.core import serializers
 from django.template.loader import get_template
+
+from rest_framework_simplejwt import views as jwt_views
+from rest_framework_simplejwt import exceptions as jwt_exp
 
 # from django.views.decorators.csrf import csrf_exempt
 # from django.utils.decorators import method_decorator
@@ -45,10 +48,17 @@ class UserInformationAPIView(views.APIView):
 # login処理
 class UserAPIView(views.APIView):
     def get_object(self, token_list):
+        """
         try:
             token = ".".join(token_list)
             payload = jwt.decode(
                 jwt=token, key=settings.SECRET_KEY, algorithms=["HS256"]
+            )
+            return User.objects.get(id=payload["user_id"])
+        """
+        try:
+            payload = jwt.decode(
+                jwt=token_list, key=settings.SECRET_KEY, algorithms=["HS256"]
             )
             return User.objects.get(id=payload["user_id"])
 
@@ -65,12 +75,11 @@ class UserAPIView(views.APIView):
             return response.Response({"error": "user does not exists"})
 
     def get(self, request, format=None):
-        head = request.GET.get("head")
-        pay = request.GET.get("pay")
-        signature = request.GET.get("signature")
-        token_list = [head, pay, signature]
+        IWT = request.COOKIES.get("iwana_user_token")
+        if not IWT:
+            return None
 
-        user = self.get_object(token_list)
+        user = self.get_object(IWT)
         if user.is_active:
             serializer = UserSerializer(user)
             return response.Response(serializer.data)
@@ -78,8 +87,10 @@ class UserAPIView(views.APIView):
 
     # change is_active false
     def put(self, request, format=None):
-        IWT = self.request.META.get("HTTP_AUTHORIZATION")
-        IWT = IWT.replace("Bearer ", "")
+        # IWT = self.request.META.get("HTTP_AUTHORIZATION")
+        # IWT = IWT.replace("Bearer ", "")
+
+        IWT = self.request.COOKEIS.get("iwana_user_token")
         token_list = IWT.split(".")
         user = self.get_object(token_list)
         if user.is_active:
@@ -178,3 +189,67 @@ def user_complete_api(request, token):
                 )
 
     return JsonResponse({"status": 400, "message": "Invalid token"}, safe=False)
+
+
+class TokenObtainPair(jwt_views.TokenObtainPairView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except jwt_exp.TokenError as e:
+            raise jwt_exp.InvalidToken(e.args[0])
+
+        res = response.Response(serializer.validated_data, status=status.HTTP_200_OK)
+        try:
+            res.delete_cookie("iwana_user_token")
+        except Exception as e:
+            print(e)
+            pass
+        res.set_cookie(
+            "iwana_user_token",
+            serializer.validated_data["access"],
+            max_age=60 * 60 * 24,
+            httponly=True,
+        )
+        res.set_cookie(
+            "iwana_refresh",
+            serializer.validated_data["refresh"],
+            max_age=60 * 60 * 24 * 30,
+            httponly=True,
+        )
+        return res
+
+
+class TokenRefresh(jwt_views.TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+
+        try:
+            serializer.is_valid(raise_exception=True)
+        except jwt_exp.TokenError as e:
+            raise jwt_exp.InvalidToken(e.args[0])
+
+        res = response.Response(serializer.validated_data, status=status.HTTP_200_OK)
+        try:
+            res.delete_cookie("iwana_user_token")
+        except Exception as e:
+            print(e)
+        res.set_cookie(
+            "iwana_user_token",
+            serializer.validated_data["access"],
+            max_age=60 * 60 * 24,
+            httponly=True,
+        )
+        return res
+
+
+def delete_jwt(request):
+    # print(request.COOKIES.get("iwana_user_token"))
+    response = HttpResponseRedirect(f"{settings.FRONT_URL}")
+    try:
+        response.delete_cookie("iwana_user_token")
+        response.delete_cookie("iwana_refresh")
+    except Exception as e:
+        print(e)
+    return response

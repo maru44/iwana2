@@ -21,7 +21,7 @@ urlpatterns = [
     # change is_gotten
     path("gotten/<wanted_slug>", api.gotten_change),
     # test
-    path("test/", api.test),
+    path("test/", api.set_cookie),
     # inquiry
     path("inquiry/", api.inquiry),
 ]

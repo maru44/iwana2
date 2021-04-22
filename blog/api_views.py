@@ -172,8 +172,7 @@ class WantedDetailAPI(views.APIView):
         return response.Response(serializer.data)
 
     def put(self, request, wanted_slug, format=None):
-        IWT = self.request.META.get("HTTP_AUTHORIZATION")
-        IWT = IWT.replace("Bearer ", "")
+        IWT = self.request.COOKIES.get("iwana_user_token")
         user_id = user_id_from_jwt(IWT)
 
         wanted = self.get_object(wanted_slug)
@@ -197,8 +196,7 @@ class WantedDetailAPI(views.APIView):
         return response.Response(status=status.HTTP_403_FORBIDDEN)
 
     def delete(self, request, wanted_slug, format=None):
-        IWT = self.request.META.get("HTTP_AUTHORIZATION")
-        IWT = IWT.replace("Bearer ", "")
+        IWT = self.request.COOKIES.get("iwana_user_token")
         user_id = user_id_from_jwt(IWT)
         wanted = self.get_object(wanted_slug)
         if wanted.user.pk == user_id:
@@ -388,3 +386,12 @@ def inquiry(request):
             headers={"Content-Type": "application/json"},
         )
         return JsonResponse({"status": r.status_code}, safe=False)
+
+
+def set_cookie(request):
+    data = {
+        "data": "aaaa",
+    }
+    res = JsonResponse(data, safe=False)
+    res.set_cookie("test2", "test_now", max_age=60 * 60 * 24 * 30, httponly=True)
+    return res

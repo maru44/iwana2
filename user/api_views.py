@@ -49,14 +49,7 @@ class UserInformationAPIView(views.APIView):
 # login処理
 class UserAPIView(views.APIView):
     def get_object(self, token_list):
-        """
-        try:
-            token = ".".join(token_list)
-            payload = jwt.decode(
-                jwt=token, key=settings.SECRET_KEY, algorithms=["HS256"]
-            )
-            return User.objects.get(id=payload["user_id"])
-        """
+
         try:
             payload = jwt.decode(
                 jwt=token_list, key=settings.SECRET_KEY, algorithms=["HS256"]
@@ -64,36 +57,39 @@ class UserAPIView(views.APIView):
             return User.objects.get(id=payload["user_id"])
 
         except jwt.ExpiredSignatureError:
-            return response.Response(
-                {"error": "Activations link expired"},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+            return "Activations link expired"
         except jwt.exceptions.DecodeError:
-            return response.Response(
-                {"error": "Invalid Token"}, status=status.HTTP_400_BAD_REQUEST
-            )
+            return "Invalid Token"
         except User.DoesNotExist:
-            return response.Response({"error": "user does not exists"})
+            return "user does not exists"
 
     def get(self, request, format=None):
         IWT = request.COOKIES.get("iwana_user_token")
         if not IWT:
-            return None
+            return response.Response(
+                {"error": "No token"}, status=status.HTTP_400_BAD_REQUEST
+            )
 
         user = self.get_object(IWT)
+        # if user.get("error") is not None:
+
+        print(type(user))
+        if type(user) == str:
+            return response.Response(
+                {"error": user}, status=status.HTTP_400_BAD_REQUEST
+            )
+
         if user.is_active:
             serializer = UserSerializer(user)
             return response.Response(serializer.data)
-        return None
+        return response.Response(
+            {"error": "user is not activate"}, status=status.HTTP_400_BAD_REQUEST
+        )
 
     # change is_active false
     def put(self, request, format=None):
-        # IWT = self.request.META.get("HTTP_AUTHORIZATION")
-        # IWT = IWT.replace("Bearer ", "")
-
         IWT = self.request.COOKEIS.get("iwana_user_token")
-        token_list = IWT.split(".")
-        user = self.get_object(token_list)
+        user = self.get_object(IWT)
         if user.is_active:
             user.is_active = False
             user.save()

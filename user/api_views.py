@@ -77,6 +77,7 @@ class UserAPIView(views.APIView):
 
     def get(self, request, format=None):
         IWT = request.COOKIES.get("iwana_user_token")
+        print(IWT)
         if not IWT:
             return None
 

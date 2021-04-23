@@ -8,6 +8,7 @@ from django.http import JsonResponse, Http404, HttpResponseRedirect
 from django.core.signing import BadSignature, SignatureExpired, loads, dumps
 
 import jwt
+import requests
 
 from django.core import serializers
 from django.template.loader import get_template
@@ -227,21 +228,36 @@ class TokenRefresh(jwt_views.TokenRefreshView):
 
         try:
             serializer.is_valid(raise_exception=True)
+            res = response.Response(
+                serializer.validated_data, status=status.HTTP_200_OK
+            )
         except jwt_exp.TokenError as e:
             raise jwt_exp.InvalidToken(e.args[0])
 
-        res = response.Response(serializer.validated_data, status=status.HTTP_200_OK)
-        try:
-            res.delete_cookie("iwana_user_token")
-        except Exception as e:
-            print(e)
-        res.set_cookie(
-            "iwana_user_token",
-            serializer.validated_data["access"],
-            max_age=60 * 60 * 24,
-            httponly=True,
-        )
         return res
+
+
+def refresh_get(request):
+    try:
+        IRT = request.COOKIES["iwana_refresh"]
+    except Exception as e:
+        print(e)
+    r = requests.post(
+        f"{settings.BACKEND_URL}/api/user/refresh/token/",
+        {
+            "refresh": IRT,
+        },
+    )
+    ret = r.json()
+    res = JsonResponse({"status": 200}, safe=False)
+    res.delete_cookie("iwana_user_token")
+    res.set_cookie(
+        "iwana_user_token",
+        ret["access"],
+        max_age=60 * 24 * 24 * 30,
+        httponly=True,
+    )
+    return res
 
 
 def delete_jwt(request):

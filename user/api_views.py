@@ -227,6 +227,12 @@ class TokenRefresh(jwt_views.TokenRefreshView):
             res = response.Response(
                 serializer.validated_data, status=status.HTTP_200_OK
             )
+            res.set_cookie(
+                "iwana_user_token",
+                serializer.validated_data["refresh"],
+                max_age=60 * 24 * 24 * 30,
+                httponly=True,
+            )
         except jwt_exp.TokenError as e:
             raise jwt_exp.InvalidToken(e.args[0])
 
@@ -236,8 +242,11 @@ class TokenRefresh(jwt_views.TokenRefreshView):
 def refresh_get(request):
     try:
         IRT = request.COOKIES["iwana_refresh"]
+        return JsonResponse({"refresh": IRT}, safe=False)
     except Exception as e:
         print(e)
+        return None
+
     r = requests.post(
         f"{settings.BACKEND_URL}/api/user/refresh/token/",
         {

@@ -8,7 +8,7 @@ urlpatterns = [
     path("login/", views.TokenObtainPair.as_view()),
     # path("refresh/", jwt_views.TokenRefreshView.as_view()),
     path("refresh/", views.refresh_get),
-    path("refresh/token/", jwt_views.TokenRefreshView.as_view()),  # @TODO
+    path("refresh/token/", views.TokenRefresh.as_view()),  # @TODO
     path("logout/", views.delete_jwt),
     path("profile/<pk>/", views.ProfileDetailView.as_view()),
     path("", views.UserAPIView.as_view()),

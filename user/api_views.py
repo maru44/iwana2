@@ -65,7 +65,6 @@ class UserAPIView(views.APIView):
 
     def get(self, request, format=None):
         IWT = request.COOKIES.get("iwana_user_token")
-        print(IWT)
         if not IWT:
             return response.Response(
                 {"error": "No token"}, status=status.HTTP_400_BAD_REQUEST
@@ -224,17 +223,17 @@ class TokenRefresh(jwt_views.TokenRefreshView):
 
         try:
             serializer.is_valid(raise_exception=True)
-            res = response.Response(
-                serializer.validated_data, status=status.HTTP_200_OK
-            )
-            res.set_cookie(
-                "iwana_user_token",
-                serializer.validated_data["refresh"],
-                max_age=60 * 24 * 24 * 30,
-                httponly=True,
-            )
         except jwt_exp.TokenError as e:
             raise jwt_exp.InvalidToken(e.args[0])
+
+        res = response.Response(serializer.validated_data, status=status.HTTP_200_OK)
+        res.delete_cookie("iwana_user_token")
+        res.set_cookie(
+            "iwana_user_token",
+            serializer.validated_data["access"],
+            max_age=60 * 24 * 24 * 30,
+            httponly=True,
+        )
 
         return res
 
@@ -246,23 +245,6 @@ def refresh_get(request):
     except Exception as e:
         print(e)
         return None
-
-    r = requests.post(
-        f"{settings.BACKEND_URL}/api/user/refresh/token/",
-        {
-            "refresh": IRT,
-        },
-    )
-    ret = r.json()
-    res = JsonResponse({"status": 200}, safe=False)
-    res.delete_cookie("iwana_user_token")
-    res.set_cookie(
-        "iwana_user_token",
-        ret["access"],
-        max_age=60 * 24 * 24 * 30,
-        httponly=True,
-    )
-    return res
 
 
 def delete_jwt(request):

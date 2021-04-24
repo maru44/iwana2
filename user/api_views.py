@@ -74,7 +74,6 @@ class UserAPIView(views.APIView):
         user = self.get_object(IWT)
         # if user.get("error") is not None:
 
-        print(type(user))
         if type(user) == str:
             return response.Response(
                 {"error": user}, status=status.HTTP_400_BAD_REQUEST
